@@ -8,4 +8,5 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - name: Check envsubst
         run: which envsubst
