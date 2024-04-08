@@ -30,7 +30,7 @@ jobs:
           fi
       - name: Scan for Malwares
         run: |
-          cat requirements.txt requirements-dev.txt | md5sum > ~/.cache/projectpiphash.now
+          cat requirements.txt requirements-dev.txt | md5sum > ~/.cache/project/piphash.now
           diff  ~/.cache/project/piphash ~/.cache/project/piphash.now || {
             sudo apt install clamav -y
             pip install -r requirements.txt -t /tmp/piptest
