@@ -35,6 +35,7 @@ check:
     pre-commit run
 
 test-ci:
+    mkdir -p $pwd/data
     export DATABASE_URL="sqlite:///$pwd/data/test_db" && \
         export PYTHONPATH=$pwd/src && \
         export ENVIRONMENT=development && \
