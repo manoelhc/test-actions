@@ -29,13 +29,13 @@ jobs:
         run: |
           sudo apt install -d clamav -y
           sudo apt install clamav -y
-          sudo freshclam
       - name: Scan for Malwares
         run: |
           cat requirements.txt requirements-dev.txt | md5sum > /tmp/piphash.now
           diff /tmp/piphash.now /tmp/piphash || {
             pip install -r requirements.txt -t /tmp/piptest
             pip install -r requirements-dev.txt -t /tmp/piptest
+
             clamscan -r /tmp/piptest
             cat /tmp/piphash.now > /tmp/piphash
           }
