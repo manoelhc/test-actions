@@ -15,9 +15,7 @@ jobs:
         with:
           path: |
             /var/lib/clamav
-            /var/cache/apt/archives
-            /tmp/piptest
-            /tmp/piphash
+            ~/.cache/project
           key: clamav
           restore-keys: clamav-data
       - name: Install Python 3.12
@@ -27,17 +25,18 @@ jobs:
           cache: 'pip'
       - name: Install dependencies
         run: |
-          sudo apt install -d clamav -y
-          sudo apt install clamav -y
+          if [ ! -d ~/.cache/project ]; then
+            mkdir ~/.cache/project
+          fi
       - name: Scan for Malwares
         run: |
-          cat requirements.txt requirements-dev.txt | md5sum > /tmp/piphash.now
-          diff /tmp/piphash.now /tmp/piphash || {
+          cat requirements.txt requirements-dev.txt | md5sum > ~/.cache/projectpiphash.now
+          diff  ~/.cache/project/piphash ~/.cache/project/piphash.now || {
+            sudo apt install clamav -y
             pip install -r requirements.txt -t /tmp/piptest
             pip install -r requirements-dev.txt -t /tmp/piptest
-
             clamscan -r /tmp/piptest
-            cat /tmp/piphash.now > /tmp/piphash
+            mv ~/.cache/project/piphash.now > ~/.cache/project/piphash
           }
       - name: TruffleHog OSS
         uses: trufflesecurity/trufflehog@main
