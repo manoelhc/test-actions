@@ -42,4 +42,4 @@ jobs:
       - name: TruffleHog OSS
         uses: trufflesecurity/trufflehog@main
         with:
-          path: /tmp/piphash
+          path: /tmp/piptest
