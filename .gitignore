@@ -7,6 +7,10 @@
 *.pyd
 *__pycache__*
 *.ruff*
+data/*
+.mypy_cache
+.pytest_cache
+.coverage
 
 # Mac files
 .DS_Store

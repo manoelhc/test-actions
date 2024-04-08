@@ -11,13 +11,15 @@ Dockerfile
 .pre-commit-trivy-cache
 *.db
 
-.pre-commit-trivy-cache
 # Python files
 *.pyc
 *.pyo
 *.pyd
 *__pycache__*
 *.ruff*
+.mypy_cache
+.pytest_cache
+.coverage
 
 # Mac files
 .DS_Store
