@@ -1,0 +1,27 @@
+.git*
+.*.yaml
+.*.yml
+*.md
+*.xml
+LICENSE
+.env*
+.idea/
+.venv/
+Dockerfile
+.pre-commit-trivy-cache
+*.db
+
+.pre-commit-trivy-cache
+# Python files
+*.pyc
+*.pyo
+*.pyd
+*__pycache__*
+*.ruff*
+
+# Mac files
+.DS_Store
+
+# Vim files
+*.swp
+*.swo

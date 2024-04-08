@@ -1,0 +1,48 @@
+repos:
+-   repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.2.0
+    hooks:
+    - id: conventional-pre-commit
+      stages: [commit-msg]
+      args: [--strict, --force-scope, feat, fix, chore, test, custom]
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  # Ruff version.
+  rev: v0.3.5
+  hooks:
+    # Run the linter.
+    - id: ruff
+      args: [ --fix ]
+    # Run the formatter.
+    - id: ruff-format
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+    -   id: check-yaml
+    -   id: debug-statements
+    #-   id: double-quote-string-fixer
+    -   id: name-tests-test
+    -   id: requirements-txt-fixer
+-   repo: https://github.com/asottile/add-trailing-comma
+    rev: v3.1.0
+    hooks:
+    -   id: add-trailing-comma
+-   repo: https://github.com/asottile/pyupgrade
+    rev: v3.15.2
+    hooks:
+    -   id: pyupgrade
+        args: [--py311-plus]
+-   repo: https://github.com/mxab/pre-commit-trivy.git
+    rev: v0.12.0
+    hooks:
+    -   id: trivyfs-docker
+        args:
+          - --skip-dirs
+          - ./tests
+          - .
+    -   id: trivyconfig-docker
+        args:
+          - --skip-dirs
+          - ./tests
+          - .

@@ -1,0 +1,15 @@
+alembic==1.13.1
+fastapi==0.110.1
+opentelemetry-distro==0.45b0
+opentelemetry-instrumentation==0.45b0
+psycopg2==2.9.9
+pydantic==2.6.4
+PyJWT==2.8.0
+pytest==8.1.1
+python-decouple==3.8
+python-dotenv==1.0.1
+redis==5.0.3
+requests==2.31.0
+SQLAlchemy==2.0.28
+sqlmodel==0.0.16
+uvicorn==0.29.0
