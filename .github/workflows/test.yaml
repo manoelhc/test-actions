@@ -18,12 +18,12 @@ jobs:
           cache: 'pip'
       - name: Install dependencies
         run: |
-          sudo apt install clamav
+          sudo apt install clamav -y
           pip install ruff
       - name: Scan for Malwares
         run: |
-          pip install -r requirements.txt -d /tmp/piptest
-          pip install -r requirements-dev.txt -d /tmp/piptest
+          pip install -r requirements.txt -t /tmp/piptest
+          pip install -r requirements-dev.txt -t /tmp/piptest
           clamscan -r /tmp/piptest
           ruff check /tmp/piptest
       - uses: chartboost/ruff-action@v1
