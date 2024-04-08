@@ -29,7 +29,14 @@ test:
         conda init && \
         conda deactivate && \
         conda activate test-actions && \
-        cd src && \
-        pytest
+        pip install -r requirements-dev.txt && \
+        pytest --cov src
 check:
     pre-commit run
+
+test-ci:
+    export DATABASE_URL="sqlite:///$pwd/data/test_db" && \
+        export PYTHONPATH=$pwd/src && \
+        export ENVIRONMENT=development && \
+        pip install -r requirements-dev.txt && \
+        pytest --cov src
