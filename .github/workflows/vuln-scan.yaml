@@ -1,0 +1,45 @@
+name: Check for Vulnerabilities
+on:
+  push:
+    branches:
+      - main
+jobs:
+  test:
+    env:
+      PIP_CACHE_DIR: /home/runner/.cache/pip
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v2
+        name: Cache static dependencies
+        with:
+          path: |
+            /var/lib/clamav
+            /var/cache/apt/archives
+            /tmp/piptest
+            /tmp/piphash
+          key: clamav
+          restore-keys: clamav-data
+      - name: Install Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - name: Install dependencies
+        run: |
+          sudo apt install -d clamav -y
+          sudo apt install clamav -y
+          sudo freshclam
+      - name: Scan for Malwares
+        run: |
+          cat requirements.txt requirements-dev.txt | md5sum > /tmp/piphash.now
+          diff /tmp/piphash.now /tmp/piphash || {
+            pip install -r requirements.txt -t /tmp/piptest
+            pip install -r requirements-dev.txt -t /tmp/piptest
+            clamscan -r /tmp/piptest
+            cat /tmp/piphash.now > /tmp/piphash
+          }
+      - name: TruffleHog OSS
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: /tmp/piphash
