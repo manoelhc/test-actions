@@ -35,9 +35,10 @@ check:
     pre-commit run
 
 test-ci:
-    mkdir -p $pwd/data
+    rm -rf $pwd/data || true && \
+        mkdir -p $pwd/data
     export DATABASE_URL="sqlite:///$pwd/data/test_db" && \
         export PYTHONPATH=$pwd/src && \
         export ENVIRONMENT=development && \
         pip install -r requirements-dev.txt && \
-        pytest --cov src
+        pytest --cov=src --cov-report=xml --cov-config=tox.ini --cov-branch src

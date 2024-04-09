@@ -5,6 +5,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/cache@v2
+        with:
+          path: ./bin
+          key: ${{ runner.os }}-deepsource
+          restore-keys: |
+            ${{ runner.os }}-deepsource
       - uses: extractions/setup-just@v2
       - name: Install Python 3.12
         uses: actions/setup-python@v5
@@ -23,3 +29,13 @@ jobs:
         with:
             token: ${{ secrets.CODECOV_TOKEN }}
             slug: manoelhc/test-actions
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: DeepSource Report
+        run: |
+          if [ ! -f ./bin/deepsource ]; then
+            curl https://deepsource.io/cli | sh
+          fi
+          ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml
