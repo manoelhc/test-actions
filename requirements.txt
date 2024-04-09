@@ -10,6 +10,6 @@ python-decouple==3.8
 python-dotenv==1.0.1
 redis==5.0.3
 requests==2.31.0
-SQLAlchemy==2.0.28
+SQLAlchemy==2.0.29
 sqlmodel==0.0.16
 uvicorn==0.29.0
