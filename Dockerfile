@@ -8,7 +8,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
-COPY . /app
+COPY src /app
+COPY requirements.txt /app
 WORKDIR /app
 ENV PYTHONPATH=/packages
 RUN pip install --cache-dir=/tmp -r requirements.txt --target=/packages
@@ -18,7 +19,7 @@ RUN python -m compileall .
 FROM gcr.io/distroless/python3-debian12@sha256:538f54b8d704c29137d337aeac1bfc874afd7db813b163b585366d57ec113e13
 WORKDIR /app
 COPY --from=builder --chown=root:root /packages /packages
-COPY --from=builder --chown=root:root /app/src /app
+COPY --from=builder --chown=root:root /app /app
 ENV PYTHONPATH=/packages
 USER nonroot
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD [ "docker_healthcheck.py" ]

@@ -21,6 +21,19 @@ ERROR_BAD_REQUEST = HTTPException(status_code=400, detail="Bad request")
 
 @router.post("/user", response_model=UserSimple)
 def create_user(user: UserCreate):
+    """
+    Creates a new user.
+
+    Args:
+        user (UserCreate): The user data to create.
+
+    Returns:
+        UserSimple: The created user.
+
+    Raises:
+        ValueError: If the username is invalid.
+        HTTPException: If the user already exists or an unexpected error occurs.
+    """
     with Session(engine) as session:
         try:
             user = User(username=user.username)
@@ -39,6 +52,15 @@ def create_user(user: UserCreate):
 
 @router.get("/users/{page}", response_model=list[UserSimple])
 def read_all_user(page: int = 1):
+    """
+    Retrieve a list of users from the database.
+
+    Args:
+        page (int, optional): The page number to retrieve. Defaults to 1.
+
+    Returns:
+        list: A list of UserSimple objects representing the users.
+    """
     with Session(engine) as session:
         users = session.exec(
             select(User)
@@ -57,6 +79,18 @@ def read_all_user(page: int = 1):
 
 @router.get("/user/{username}", response_model=UserSimple)
 def read_user(username: str):
+    """
+    Retrieve a user by their username.
+
+    Args:
+        username (str): The username of the user to retrieve.
+
+    Returns:
+        UserSimple: The retrieved user object.
+
+    Raises:
+        ERROR_USER_NOT_FOUND: If the user is not found.
+    """
     with Session(engine) as session:
         try:
             user = session.exec(
@@ -75,15 +109,32 @@ def read_user(username: str):
 
 @router.put("/user", response_model=UserSimple)
 def update_user(user_request: UserUpdate):
+    """
+    Update a user's information in the database.
+
+    Args:
+        user_request (UserUpdate): The updated user information.
+
+    Returns:
+        UserSimple: The updated user information.
+
+    Raises:
+        ValueError: If the username is invalid.
+        IntegrityError: If the username is already taken by another user.
+    """
     with Session(engine) as session:
         user = session.exec(select(User).where(User.id == user_request.id)).first()
         try:
-            # Check the new username is already taken
-            if user.username != user_request.username:
-                if session.exec(
-                    select(User).where(User.username == user_request.username),
-                ).first():
-                    raise ERROR_USER_ALREADY_EXISTS
+            # Check if the new username is already taken
+            user_already_taken = session.exec(
+                select(User).where(
+                    User.username == user_request.username,
+                    User.id != user_request.id,
+                ),
+            ).first()
+
+            if user_already_taken:
+                raise ERROR_USER_ALREADY_EXISTS
 
             user.username = user_request.username
             user.model_validate(user)
@@ -100,6 +151,19 @@ def update_user(user_request: UserUpdate):
 
 @router.delete("/user/{username}", response_model=UserSimple)
 def delete_user(username: str):
+    """
+    Deletes a user by setting their 'is_active' flag to False, appending '[deleted]' to their username,
+    and updating the 'deleted_at' field with the current datetime.
+
+    Args:
+        username (str): The username of the user to be deleted.
+
+    Returns:
+        dict: A dictionary representing the deleted user's information.
+
+    Raises:
+        ERROR_USER_NOT_FOUND: If the user with the given username is not found.
+    """
     with Session(engine) as session:
         user = session.exec(select(User).where(User.username == username)).first()
         if user is None:

@@ -6,12 +6,31 @@ from pydantic import field_validator
 
 
 class UserCreate(SQLModel):
+    """
+    Represents a user creation request.
+
+    Attributes:
+        username (str): The username of the user to be created.
+    """
+
     username: str
 
     @field_validator("username")
     @classmethod
-    def username_check(cls, v):
-        username = v.strip().lower()
+    def username_check(cls, username: str):
+        """
+        Validates the username attribute.
+
+        Args:
+            username (str): The value of the username attribute.
+
+        Raises:
+            ValueError: If the username is less than 2 characters or contains non-alphanumeric characters.
+
+        Returns:
+            str: The validated username.
+        """
+        username = username.strip().lower()
         if len(username) <= 2:
             raise ValueError("Username should be more than 2 characters")
         if re.match(r"^\w*$", username) is None:
@@ -20,6 +39,18 @@ class UserCreate(SQLModel):
 
 
 class User(UserCreate, table=True):
+    """
+    Represents a user entity.
+
+    Attributes:
+        id (uuid.UUID): The unique identifier of the user.
+        username (str): The username of the user.
+        is_active (bool): Indicates whether the user is active or not.
+        created_at (datetime): The timestamp when the user was created.
+        updated_at (datetime | None): The timestamp when the user was last updated, or None if never updated.
+        deleted_at (datetime | None): The timestamp when the user was deleted, or None if not deleted.
+    """
+
     __tablename__ = "users"
     id: uuid.UUID = Field(
         default_factory=uuid.uuid4,
@@ -35,6 +66,17 @@ class User(UserCreate, table=True):
 
 
 class UserSimple(SQLModel):
+    """
+    Represents a simplified user entity.
+
+    Attributes:
+        username (str): The username of the user.
+        id (uuid.UUID): The unique identifier of the user.
+        is_active (bool): Indicates whether the user is active or not.
+        created_at (datetime): The timestamp when the user was created.
+        updated_at (datetime | None): The timestamp when the user was last updated, or None if never updated.
+    """
+
     username: str
     id: uuid.UUID
     is_active: bool
@@ -43,6 +85,15 @@ class UserSimple(SQLModel):
 
 
 class UserUpdate(SQLModel):
+    """
+    Represents a user update request.
+
+    Attributes:
+        username (str): The updated username of the user.
+        id (uuid.UUID): The unique identifier of the user.
+        is_active (bool): Indicates whether the user is active or not.
+    """
+
     username: str
     id: uuid.UUID
     is_active: bool

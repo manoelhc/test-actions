@@ -41,3 +41,8 @@ jobs:
             curl https://deepsource.io/cli | sh
           fi
           ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml
+      - name: Codacy Report
+        uses: codacy/codacy-coverage-reporter-action@v1
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: ./coverage.xml

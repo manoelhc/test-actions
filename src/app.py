@@ -1,27 +1,27 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 import uvicorn
+
 from routers import user, healthcheck
 import config
-
-# CORS protection
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
 # CORS protection
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=config.CORS_ALLOW_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=config.CORS_ALLOW_METHODS,
+    allow_headers=config.CORS_ALLOW_HEADERS,
 )
 app.include_router(user.router)
 app.include_router(healthcheck.router)
 
 if __name__ == "__main__":
-    if config.ENVIRONMENT == "development":
+    if config.IS_DEVELOPMENT:
         from migrations import create_db_and_tables
 
         create_db_and_tables()
-    uvicorn.run(app, host="0.0.0.0", port=5000)
+    uvicorn.run(app, host=config.HOST, port=config.PORT)

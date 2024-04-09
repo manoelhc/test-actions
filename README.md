@@ -13,4 +13,3 @@ This is a simple project to test GitHub Actions and other tools. The project is 
 [![DeepSource](https://app.deepsource.com/gh/manoelhc/test-actions.svg/?label=active+issues&show_trend=true&token=mIKCccso-KAHSUB9eOIoNuBl)](https://app.deepsource.com/gh/manoelhc/test-actions/)
 [![DeepSource](https://app.deepsource.com/gh/manoelhc/test-actions.svg/?label=resolved+issues&show_trend=true&token=mIKCccso-KAHSUB9eOIoNuBl)](https://app.deepsource.com/gh/manoelhc/test-actions/)
 [![DeepSource](https://app.deepsource.com/gh/manoelhc/test-actions.svg/?label=code+coverage&show_trend=true&token=mIKCccso-KAHSUB9eOIoNuBl)](https://app.deepsource.com/gh/manoelhc/test-actions/)
-
