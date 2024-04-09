@@ -15,7 +15,7 @@ def check_health(port=config.PORT):
     """
     try:
         url = f"http://{config.HOST}:{port}/health"
-        response = requests.get(url)
+        response = requests.get(url, timeout=5)
 
         if response.status_code == 200:
             print("Healthcheck passed")
