@@ -4,6 +4,7 @@ import config
 
 
 def check_health(port=config.PORT):
+    # skipcq: FLK-W505
     """
     Check the health of a service by sending a GET request to the health endpoint.
 
@@ -20,9 +21,8 @@ def check_health(port=config.PORT):
         if response.status_code == 200:
             print("Healthcheck passed")
             return True
-        else:
-            print("Healthcheck failed")
-            return False
+        print("Healthcheck failed")
+        return False
     except requests.exceptions.ConnectionError:
         print("Healthcheck failed")
         return False

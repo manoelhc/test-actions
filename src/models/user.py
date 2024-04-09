@@ -17,6 +17,7 @@ class UserCreate(SQLModel):
 
     @field_validator("username")
     @classmethod
+    # skipcq: FLK-W505
     def username_check(cls, username: str):
         """
         Validates the username attribute.
@@ -39,6 +40,7 @@ class UserCreate(SQLModel):
 
 
 class User(UserCreate, table=True):
+    # skipcq: FLK-W505
     """
     Represents a user entity.
 
@@ -66,6 +68,7 @@ class User(UserCreate, table=True):
 
 
 class UserSimple(SQLModel):
+    # skipcq: FLK-W505
     """
     Represents a simplified user entity.
 

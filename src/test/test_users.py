@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-from migrations import create_db_and_tables, delete_db_and_tables
+from migrations import create_db_and_tables, delete_db_and_tables, seed_db
 from app import app
 import pytest
 
@@ -7,6 +7,7 @@ import pytest
 @pytest.fixture
 def client():
     create_db_and_tables()
+    seed_db()
     client = TestClient(app)
     yield client
     delete_db_and_tables()
@@ -215,6 +216,12 @@ def test_changing_user_name(client: TestClient):
 
 
 def test_delete_users(client: TestClient):
+    response = client.delete("/user/demo")
+    assert response.status_code == 200
+    for i in range(1, 31):
+        user_number = str(i).rjust(3, "0")
+        response = client.post("/user", json={"username": f"test_read_{user_number}"})
+        assert response.status_code == 200
     response = client.get("/users/1")
     output = response.json()
     for user in output:
@@ -222,27 +229,32 @@ def test_delete_users(client: TestClient):
         assert response.status_code == 200
         response = client.get(f"/user/{user['username']}")
         assert response.status_code == 404
+        response = client.get(f"/user/{user['username']}[deleted]")
+        assert response.status_code == 404
 
 
 def test_read_all_users(client: TestClient):
+    response = client.delete("/user/demo")
+    assert response.status_code == 200
+
     # Generate 50 users
     for i in range(1, 31):
         user_number = str(i).rjust(3, "0")
-        response = client.post("/user", json={"username": f"test_read_{user_number}"})
+        response = client.post("/user", json={"username": f"1_{user_number}"})
         assert response.status_code == 200
 
     # Test all users
     response = client.get("/users/1")
     output = response.json()
     assert len(output) == 20
-    assert output[0]["username"] == "test_read_001"
-    assert output[19]["username"] == "test_read_020"
+    assert output[0]["username"] == "1_001"
+    assert output[19]["username"] == "1_020"
 
     response = client.get("/users/2")
     output = response.json()
     assert len(output) == 10
-    assert output[0]["username"] == "test_read_021"
-    assert output[9]["username"] == "test_read_030"
+    assert output[0]["username"] == "1_021"
+    assert output[9]["username"] == "1_030"
 
     response = client.get("/users/3")
     output = response.json()
@@ -252,7 +264,7 @@ def test_read_all_users(client: TestClient):
     # Delete all users
     for i in range(1, 31):
         user_number = str(i).rjust(3, "0")
-        response = client.delete(f"/user/test_read_{user_number}")
+        response = client.delete(f"/user/1_{user_number}")
         assert response.status_code == 200
 
     # List all users (should be empty)
