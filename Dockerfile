@@ -2,9 +2,9 @@
 FROM python@sha256:b4b901d9304f0b4af0157eb021300eb4775a3af8fdbd3e9504dbfd4be16e9ee3 AS builder
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    rustc \
-    libpq-dev \
+    build-essential=12.9 \
+    rustc=1.63.0+dfsg1-2 \
+    libpq-dev=15.6-0+deb12u1 \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
