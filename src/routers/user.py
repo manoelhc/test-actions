@@ -151,10 +151,9 @@ def update_user(user_request: UserUpdate):
 
 @router.delete("/user/{username}", response_model=UserSimple)
 def delete_user(username: str):
-    # skipcq: FLK-W505
     """
-    Deletes a user by setting their 'is_active' flag to False, appending '[deleted]' to their username,
-    and updating the 'deleted_at' field with the current datetime.
+    Deletes a user by setting their 'is_active' flag to False, appending '[deleted]'
+    to their username, and updating the 'deleted_at' field with the current datetime.
 
     Args:
         username (str): The username of the user to be deleted.

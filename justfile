@@ -42,4 +42,4 @@ test-ci:
         export PYTHONPATH=$pwd/src && \
         export ENVIRONMENT=development && \
         pip install -r requirements-dev.txt && \
-        pytest --cov=src --cov-report=xml --cov-config=tox.ini --cov-branch src
+        pytest --cov=src --cov-report=xml --cov-config=tox.ini --cov-branch src --full-trace

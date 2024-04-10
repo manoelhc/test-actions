@@ -26,7 +26,8 @@ class UserCreate(SQLModel):
             username (str): The value of the username attribute.
 
         Raises:
-            ValueError: If the username is less than 2 characters or contains non-alphanumeric characters.
+            ValueError: If the username is less than 2 characters or contains
+            non-alphanumeric characters.
 
         Returns:
             str: The validated username.
@@ -49,8 +50,10 @@ class User(UserCreate, table=True):
         username (str): The username of the user.
         is_active (bool): Indicates whether the user is active or not.
         created_at (datetime): The timestamp when the user was created.
-        updated_at (datetime | None): The timestamp when the user was last updated, or None if never updated.
-        deleted_at (datetime | None): The timestamp when the user was deleted, or None if not deleted.
+        updated_at (datetime | None): The timestamp when the user was last updated,
+                                      or None if never updated.
+        deleted_at (datetime | None): The timestamp when the user was deleted,
+                                      or None if not deleted.
     """
 
     __tablename__ = "users"
@@ -77,7 +80,8 @@ class UserSimple(SQLModel):
         id (uuid.UUID): The unique identifier of the user.
         is_active (bool): Indicates whether the user is active or not.
         created_at (datetime): The timestamp when the user was created.
-        updated_at (datetime | None): The timestamp when the user was last updated, or None if never updated.
+        updated_at (datetime | None): The timestamp when the user was last
+                                      updated, or None if never updated.
     """
 
     username: str
