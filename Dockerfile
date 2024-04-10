@@ -26,5 +26,5 @@ COPY --from=builder --chown=root:root /packages /packages
 COPY --from=builder --chown=root:root /app /app
 ENV PYTHONPATH=/packages
 USER nonroot
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD [ "docker_healthcheck.py" ]
+HEALTHCHECK --interval=5s --timeout=30s --start-period=2s --retries=3 CMD [ "python", "docker_healthcheck.py" ]
 CMD ["app.py"]

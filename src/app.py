@@ -24,4 +24,4 @@ if __name__ == "__main__":
         from migrations import create_db_and_tables
 
         create_db_and_tables()
-    uvicorn.run(app, host=config.HOST, port=config.PORT)
+    uvicorn.run(app, host=config.HOST, port=int(config.PORT))
