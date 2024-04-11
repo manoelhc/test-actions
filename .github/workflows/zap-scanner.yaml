@@ -1,5 +1,8 @@
-on: [push]
 name: ZAP Scan
+on:
+  push:
+    branches:
+      - main
 permissions:
   issues: write
 jobs:
