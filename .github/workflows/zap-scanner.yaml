@@ -7,7 +7,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: extractions/setup-just@v2
       - name: Run image
-        run: just run
+        run: just run-ci
       - name: ZAP Scan
         uses: zaproxy/action-api-scan@v0.7.0
         with:

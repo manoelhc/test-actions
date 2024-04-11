@@ -17,6 +17,9 @@ build:
 run:
     docker build -t test-actions . && \
         docker run -it -p 5000:5000 -e ENVIRONMENT=development -v $pwd/data:/data test-actions
+run-ci:
+    docker build -t test-actions . && \
+        docker run -d -p 5000:5000 -e ENVIRONMENT=development -v $pwd/data:/data test-actions
 run-local:
     docker run -it -p 5000:5000 -e ENVIRONMENT=development -e 'DATABASE_URL=sqlite:////data/test_db' -v $pwd/data:/data -v $pwd/src:/app test-actions
 test:
