@@ -4,14 +4,9 @@ jobs:
     runs-on: ubuntu-latest
     name: Scan the webapplication
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          ref: master
-
+      - uses: actions/checkout@v4
       - name: Run image
         run: just run
-
       - name: ZAP Scan
         uses: zaproxy/action-api-scan@v0.7.0
         with:
