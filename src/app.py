@@ -19,6 +19,7 @@ app.add_middleware(
 app.include_router(user.router)
 app.include_router(healthcheck.router)
 
+# skipcq: TCV-001 - This is the main entry point of the application
 if __name__ == "__main__":
     if config.IS_DEVELOPMENT:
         from migrations import create_db_and_tables
