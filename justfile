@@ -67,11 +67,14 @@ test: install-deps
         pytest --cov src
 
 # Use this command to run pytest in CI/CD pipeline and generate coverage report
-test-ci: install-deps
-    cd $pwd && \
+test-ci:
+    pip install -e packages/localtest-docker && \
+        pip install -r requirements.txt && \
+        pip install -r requirements-dev.txt && \
+        cd $pwd && \
         rm -rf data || true && \
         mkdir -p data
-    export DATABASE_URL="sqlite:///$pwd/data/test_db" && \
+        export DATABASE_URL="sqlite:///$pwd/data/test_db" && \
         export PYTHONPATH=$pwd/src && \
         export ENVIRONMENT=development && \
         export HOST=0.0.0.0 && \
