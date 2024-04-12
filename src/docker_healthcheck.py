@@ -18,7 +18,7 @@ def check_health(port: str = config.PORT, endpoint: str = "/health"):
         bool: True if the healthcheck passes (status code 200),
               False otherwise.
     """
-    url = f"{config.PROTOCOL}://{config.HOST}:{port}/{endpoint}"
+    url = f"{config.PROTOCOL}://{config.HOST}:{port}{endpoint}"
     retry = 0
     max_retries = 3
     while True:
@@ -29,12 +29,10 @@ def check_health(port: str = config.PORT, endpoint: str = "/health"):
             if response.status_code == 200:
                 print(f"Healthcheck passed: {url}")
                 return True
-        except requests.exceptions.ConnectionError:
-            print(f"Healthcheck failed: {url}")
-            return False
+        except requests.exceptions.ConnectionError as e:
+            print(f"Attempt #{retry} failed: {url} {e}")
         retry = retry + 1
         sleep(1)
-
     print(f"Healthcheck failed: {url}")
     return False
 

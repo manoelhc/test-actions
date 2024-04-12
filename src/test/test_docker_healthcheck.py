@@ -1,14 +1,14 @@
 from time import sleep
 import pytest
-import subprocess
+import docker
 import datetime
 import hashlib
-import random
 from docker_healthcheck import check_health
 import socket
 import logging
+import secrets
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
@@ -29,8 +29,7 @@ class DockerContainerDaemon:
     tags = []
     container_names = []
 
-    @staticmethod
-    def system_call(cmd: list[str], timeout=10) -> bool:
+    def _docker_build(self) -> bool:
         """
         Execute a system command.
 
@@ -44,13 +43,57 @@ class DockerContainerDaemon:
         Returns:
             bool: True if the command execution is successful, False otherwise.
         """
-        tmp = " ".join(cmd)
-        print(f"Running command: {tmp}")
-        try:
-            subprocess.run(cmd, check=True, timeout=timeout)
+        image = self._client.images.build(
+            path=self._context,
+            tag=f"{self._image_name}:{self._tag}",
+            dockerfile=self._dockerfile_path,
+        )
+        if image:
             return True
-        except subprocess.CalledProcessError:
-            return False
+        return False
+
+    def _docker_run(self) -> bool:
+        """
+        Execute a system command.
+
+        Args:
+            cmd (list): The command to be executed.
+            timeout (int): The timeout for the command execution
+                           (default is 5 seconds).
+            envs (dict): Additional environment variables for the command execution
+                         (default is an empty dictionary).
+
+        Returns:
+            bool: True if the command execution is successful, False otherwise.
+        """
+
+        env = {
+            "HOST": "0.0.0.0",  # nosec: B104
+        }
+        container = self._client.containers
+        result = container.run(
+            f"{self._image_name}:{self._tag}",
+            name=self._container_name,
+            detach=True,
+            environment=env,
+            ports={self._port: self._port},
+        )
+
+        if result:
+            return True
+        logger.error("Error running the container.")
+        return False
+
+    def _docker_exec(self, cmd: list[str], envs: dict[str, str]) -> bool:
+        container = self._client.containers.get(self._container_name)
+        if container:
+            result = container.exec_run(cmd=" ".join(cmd), environment=envs)
+            if result and result.exit_code == 0:
+                return True
+            logger.error(
+                f"Error executing the command: Container {container.name}, Command {cmd}",
+            )
+        return False
 
     @staticmethod
     def get_hash():
@@ -62,7 +105,7 @@ class DockerContainerDaemon:
         """
         rands = (
             "DCD"
-            + "-".join([str(random.randint(0, 1000)) for _ in range(10)])
+            + "-".join([str(secrets.randbits(32)) for _ in range(10)])
             + str(datetime.datetime.now())
         )
         return hashlib.sha256(rands.encode()).hexdigest()[:15]
@@ -78,7 +121,16 @@ class DockerContainerDaemon:
         Returns:
             bool: True if the Docker object exists, False otherwise.
         """
-        return DockerContainerDaemon.system_call(["docker", "inspect", name])
+        try:
+            client = docker.from_env()
+            container = client.containers.list(all=True, filters={"name": name})
+            if container:
+                return True
+            image = client.images.list(filters={"reference": name})
+            if image:
+                return True
+        except docker.errors.APIError:
+            return False
 
     @staticmethod
     def get_next_port():
@@ -93,10 +145,9 @@ class DockerContainerDaemon:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 return s.connect_ex(("localhost", port)) == 0
 
-        port = random.randint(5000, 8000)
-
+        port = 5000
         while port in DockerContainerDaemon.ports or is_port_in_use(port):
-            port = random.randint(5000, 6000)
+            port = port + 1
 
         DockerContainerDaemon.ports.append(port)
         return port
@@ -147,6 +198,35 @@ class DockerContainerDaemon:
         DockerContainerDaemon.container_names.append(container_name)
         return container_name
 
+    @staticmethod
+    def task_run(func, max_retries=3):
+        """
+        A decorator to retry a function for a maximum number of times.
+
+        Args:
+            func (function): The function to be executed.
+            max_retries (int, optional): The maximum number of retries.
+                                         Defaults to 3.
+
+        Returns:
+            function: The wrapped function.
+        """
+
+        def wrapper(*args, **kwargs):
+            retry = 0
+            while True:
+                if retry >= max_retries:
+                    break
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    logger.error(f"Error running the function: {e}")
+                retry = retry + 1
+                sleep(1)
+            return False
+
+        return wrapper
+
     def __init__(
         self,
         port: int = 0,
@@ -155,31 +235,34 @@ class DockerContainerDaemon:
         context: str = ".",
         dockerfile_path: str = "./Dockerfile",
     ) -> None:
+        self._client = docker.from_env()
         """
         Initialize a DockerContainerDaemon object.
 
         Args:
-            port (int, optional): The port number to expose on the container. Defaults to 0.
-            image_name (str, optional): The name of the Docker image. Defaults to an empty string.
-            tag (str, optional): The tag of the Docker image. Defaults to an empty string.
-            context (str, optional): The build context for the Docker image. Defaults to ".".
-            dockerfile_path (str, optional): The path to the Dockerfile. Defaults to "./Dockerfile".
+            port (int, optional): The port number to expose on the container.
+            image_name (str, optional): The name of the Docker image.
+            tag (str, optional): The tag of the Docker image.
+            context (str, optional): The build context for the Docker image.
+            dockerfile_path (str, optional): The path to the Dockerfile.
         """
-        self.dockerfile_path = dockerfile_path
+        self._dockerfile_path = dockerfile_path
         if tag == "":
             tag = DockerContainerDaemon.get_next_tag()
-        self.tag = tag
+        self._tag = tag
 
         if image_name == "":
-            image_name = DockerContainerDaemon.get_next_image_name()
-        self.image_name = image_name
+            image_name = "pytest_" + DockerContainerDaemon.get_next_image_name()
+        self._image_name = image_name
 
         if port == 0:
             port = DockerContainerDaemon.get_next_port()
-        self.port = str(port)
+        self._port = str(port)
 
-        self.context = context
-        self.container_name = DockerContainerDaemon.get_next_container_name()
+        self._context = context
+        self._container_name = (
+            "pytest_" + DockerContainerDaemon.get_next_container_name()
+        )
 
     def build(self) -> bool:
         """
@@ -188,18 +271,7 @@ class DockerContainerDaemon:
         Returns:
             bool: True if the build was successful, False otherwise.
         """
-        return DockerContainerDaemon.system_call(
-            [
-                "docker",
-                "build",
-                "-t",
-                f"{self.image_name}:{self.tag}",
-                "-f",
-                self.dockerfile_path,
-                self.context,
-            ],
-            timeout=300,
-        )
+        return self._docker_build()
 
     def start(self):
         """
@@ -210,29 +282,9 @@ class DockerContainerDaemon:
         """
         # Start the app.
         if not self.is_running():
-            cmd = [
-                "docker",
-                "run",
-                "-d",
-                "-e",
-                f"PORT={self.port}",
-                "-e",
-                "HOST=0.0.0.0",
-                "-p",
-                f"{self.port}:{self.port}",
-                "--name",
-                self.container_name,
-                f"{self.image_name}:{self.tag}",
-            ]
-            if DockerContainerDaemon.system_call(cmd):
-                retry = 0
-                max_retries = 2
-                while not self.is_running():
-                    if retry == max_retries:
-                        return False
-                    sleep(1)
-                    retry = retry + 1
-                return True
+            container = self._docker_run()
+            if container:
+                return self.is_running()
         return False
 
     def is_running(self) -> bool:
@@ -242,15 +294,15 @@ class DockerContainerDaemon:
         Returns:
             bool: True if the container is running, False otherwise.
         """
-        # Check if the app is running.
-        if self.container_name == "":
-            return False
-        res = DockerContainerDaemon.system_call(
-            ["docker", "inspect", self.container_name],
-            timeout=10,
-        )
-        print(f"Container {self.container_name} is running?: {res}")
-        return res
+        for i in range(1, 6):
+            try:
+                container = self._client.containers.get(self._container_name)
+                if container and container.status == "running":
+                    return True
+            except docker.errors.NotFound:
+                logger.error("Attempt #%s failed.", i)
+            sleep(1)
+        return False
 
     def get_port(self):
         """
@@ -259,28 +311,32 @@ class DockerContainerDaemon:
         Returns:
             int: The port of the container.
         """
-        return self.port
+        return self._port
 
     def run(self, cmd: list[str], env: dict[str, str] = None):
         """
-        Run a command inside the Docker container.
+        Executes a command within a Docker container.
 
         Args:
-            cmd (list): The command to be executed inside the container.
-            env (dict): Additional environment variables for the command
-                        execution (default is an empty dictionary).
+            cmd (list[str]): The command to be executed.
+            env (dict[str, str], optional): Environment variables to be set for
+                                            the command execution. Defaults to None.
 
         Returns:
             bool: True if the command execution is successful, False otherwise.
         """
-        envs = ["-e", f"PORT={self.get_port()}"]
-        if env is not None:
-            for key, value in env.items():
-                envs.append("-e")
-                envs.append(f"{key}={value}")
-
-        full_cmd = ["docker", "exec", *envs, self.container_name] + cmd
-        return DockerContainerDaemon.system_call(full_cmd)
+        defaults = {
+            "HOST": "0.0.0.0",  # nosec: B104
+        }
+        if env:
+            env = defaults | env
+        else:
+            env = defaults
+        try:
+            return self._docker_exec(cmd, envs=env)
+        except Exception as e:
+            logger.error(f"Error running command: {e}")
+        return False
 
     def terminate(self) -> bool:
         """
@@ -290,23 +346,28 @@ class DockerContainerDaemon:
             bool: True if the container is terminated successfully, False otherwise.
         """
         # Shutdown the app
-        return DockerContainerDaemon.system_call(
-            ["docker", "stop", self.container_name],
-        )
+        try:
+            container = self._client.containers.get(self._container_name)
+            if container:
+                container.stop()
+                return True
+            return False
+        except docker.errors.NotFound:
+            return False
 
     def destroy(self) -> bool:
-        """
-        Destroy the Docker container.
-
-        Returns:
-            bool: True if the container is destroyed successfully, False otherwise.
-        """
-        # Destroy the container and image.
-        return DockerContainerDaemon.system_call(
-            ["docker", "rm", self.container_name],
-        ) and DockerContainerDaemon.system_call(
-            ["docker", "rmi", f"{self.image_name}:{self.tag}", "-f"],
-        )
+        self.terminate()
+        try:
+            container = self._client.containers.get(self._container_name)
+            if container:
+                container.remove()
+                image = self._client.images.get(self._image_name)
+                if image:
+                    image.remove()
+                    return True
+        except docker.errors.NotFound:
+            logger.debug("Container or image not found.")
+        return False
 
 
 @pytest.fixture
@@ -331,7 +392,7 @@ def test_check_health(docker_session: DockerContainerDaemon):
     Returns:
         None
     """
-    assert check_health(docker_session.get_port())
+    assert check_health(docker_session.get_port())  # nosec: B101
 
 
 def test_check_invalid_port_endpoint(docker_session: DockerContainerDaemon):
@@ -345,7 +406,7 @@ def test_check_invalid_port_endpoint(docker_session: DockerContainerDaemon):
     Returns:
         None
     """
-    assert not check_health("8088")
+    assert not check_health("8088")  # nosec: B101
 
 
 def test_check_invalid_host_endpoint(docker_session: DockerContainerDaemon):
@@ -359,7 +420,7 @@ def test_check_invalid_host_endpoint(docker_session: DockerContainerDaemon):
     Returns:
         None
     """
-    assert not docker_session.run(
+    assert not docker_session.run(  # nosec: B101
         ["python", "docker_healthcheck.py"],
         {"HOST": "whatever_host"},
     )
@@ -376,21 +437,7 @@ def test_check_invalid_path_endpoint(docker_session: DockerContainerDaemon):
     Returns:
         None
     """
-    assert not check_health(docker_session.get_port(), "/invalid_endpoint")
-
-
-def test_check_invalid_health_endpoint(docker_session: DockerContainerDaemon):
-    """
-    Test case for checking an invalid health endpoint.
-
-    Args:
-        docker_session (DockerContainerDaemon): The Docker container
-        daemon session.
-
-    Returns:
-        None
-    """
-    assert not check_health("8088")
+    assert not check_health(docker_session.get_port(), "/invalid_endpoint")  # nosec: B101
 
 
 def test_check_health_calling_the_file(docker_session: DockerContainerDaemon):
@@ -403,7 +450,7 @@ def test_check_health_calling_the_file(docker_session: DockerContainerDaemon):
     Returns:
         None
     """
-    assert docker_session.run(["python", "docker_healthcheck.py"])
+    assert docker_session.run(["python", "docker_healthcheck.py"])  # nosec: B101
 
 
 def test_check_invalid_file(docker_session: DockerContainerDaemon):
@@ -415,7 +462,7 @@ def test_check_invalid_file(docker_session: DockerContainerDaemon):
         run the test on.
 
     """
-    assert not docker_session.run(["python", "invalid_file.py"])
+    assert not docker_session.run(["python", "invalid_file.py"])  # nosec: B101
 
 
 def test_check_health_calling_the_module(docker_session: DockerContainerDaemon):
@@ -428,4 +475,4 @@ def test_check_health_calling_the_module(docker_session: DockerContainerDaemon):
     Returns:
         None
     """
-    assert docker_session.run(["python", "-m", "docker_healthcheck"])
+    assert docker_session.run(["python", "-m", "docker_healthcheck"])  # nosec: B101
