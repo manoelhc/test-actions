@@ -1,10 +1,22 @@
 repos:
+- repo: local
+  hooks:
+    # This hook checks for secrets in the repository. If you are committing secrets or keys, it won't let you commit your stuff.
+    - id: trufflehog
+      name: TruffleHog
+      description: Detect secrets in your data.
+      entry: bash -c 'docker run -v "$(pwd):/workdir" --rm us-docker.pkg.dev/thog-artifacts/public/scanner:latest git main HEAD /workdir'
+      language: system
+      stages: ["commit", "push"]
+# This one is to check if the commit message follows the conventional commit standard. https://www.conventionalcommits.org/en/v1.0.0/
+# It will check if the commit message starts with "feat", "fix", "chore", "test" or "custom". You must follow the pattern.
 -   repo: https://github.com/compilerla/conventional-pre-commit
     rev: v3.2.0
     hooks:
     - id: conventional-pre-commit
       stages: [commit-msg]
       args: [--strict, --force-scope, feat, fix, chore, test, custom]
+# This one checks if the code is formatted according to the black standard. https://black.readthedocs.io/en/stable/
 - repo: https://github.com/astral-sh/ruff-pre-commit
   # Ruff version.
   rev: v0.3.5
@@ -14,6 +26,7 @@ repos:
       args: [ --fix ]
     # Run the formatter.
     - id: ruff-format
+# This ones checks all the basic stuff. Like trailing whitespaces, end of file, yaml syntax, debug statements, etc.
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
@@ -28,11 +41,14 @@ repos:
     rev: v3.1.0
     hooks:
     -   id: add-trailing-comma
+# This one helps you to upgrade your python code to the latest version. It will upgrade your code to the latest version of python.
+# It's useful when you are using old code from tutorials or old projects. It will help you to keep your code up to date.
 -   repo: https://github.com/asottile/pyupgrade
     rev: v3.15.2
     hooks:
     -   id: pyupgrade
         args: [--py311-plus]
+# This one checks the Dockerfile for security vulnerabilities. It uses Trivy to check the Dockerfile.
 -   repo: https://github.com/mxab/pre-commit-trivy.git
     rev: v0.12.0
     hooks:

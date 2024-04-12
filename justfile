@@ -70,8 +70,10 @@ test-ci:
     export DATABASE_URL="sqlite:///$pwd/data/test_db" && \
         export PYTHONPATH=$pwd/src && \
         export ENVIRONMENT=development && \
+        export HOST=0.0.0.0 && \
         pip install -r requirements-dev.txt && \
-        pytest --cov=src --cov-report=xml --cov-config=tox.ini --cov-branch src
+        pip install -r requirements.txt && \
+        pytest --cov=src --cov-report=xml --cov-config=tox.ini --cov-branch src --full-trace
 
 # Use this command to check your code before committing (pre-commit hooks)
 check:
