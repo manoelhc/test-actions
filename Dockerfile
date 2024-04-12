@@ -1,5 +1,5 @@
 # Builder
-FROM python@sha256:c6751fa575260522ca11fbad88394e12cbe31d0d8951d3d29301192745a09aab AS builder
+FROM python@sha256:e0e2713ebf0f7b114b8bf9fbcaba9a69ef80e996b9bb3fa5837e42c779dcdc0f AS builder
 LABEL org.opencontainers.image.source="https://github.com/docker-library/python"
 LABEL org.opencontainers.image.description="Python 3.12.0"
 WORKDIR /app
@@ -18,7 +18,7 @@ RUN pip install --cache-dir=/tmp -r requirements.txt --target=/packages
 RUN python -m compileall .
 
 # Final
-FROM python@sha256:c6751fa575260522ca11fbad88394e12cbe31d0d8951d3d29301192745a09aab
+FROM python@sha256:e0e2713ebf0f7b114b8bf9fbcaba9a69ef80e996b9bb3fa5837e42c779dcdc0f
 WORKDIR /app
 COPY --from=builder --chown=root:root /packages /packages
 COPY --from=builder --chown=root:root /app /app
