@@ -66,7 +66,6 @@ class DockerContainerDaemon:
         Returns:
             bool: True if the command execution is successful, False otherwise.
         """
-
         env = {
             "HOST": "0.0.0.0",  # nosec: B104
         }
@@ -91,7 +90,9 @@ class DockerContainerDaemon:
             if result and result.exit_code == 0:
                 return True
             logger.error(
-                f"Error executing the command: Container {container.name}, Command {cmd}",
+                "Error executing the command: Container %s, Command %s",
+                container.name,
+                cmd,
             )
         return False
 
@@ -129,8 +130,9 @@ class DockerContainerDaemon:
             image = client.images.list(filters={"reference": name})
             if image:
                 return True
-        except docker.errors.APIError:
-            return False
+        except docker.errors.APIError as e:
+            logger.error("Error checking if the object exists: %s", e)
+        return False
 
     @staticmethod
     def get_next_port():
@@ -197,35 +199,6 @@ class DockerContainerDaemon:
             container_name = DockerContainerDaemon.get_hash()
         DockerContainerDaemon.container_names.append(container_name)
         return container_name
-
-    @staticmethod
-    def task_run(func, max_retries=3):
-        """
-        A decorator to retry a function for a maximum number of times.
-
-        Args:
-            func (function): The function to be executed.
-            max_retries (int, optional): The maximum number of retries.
-                                         Defaults to 3.
-
-        Returns:
-            function: The wrapped function.
-        """
-
-        def wrapper(*args, **kwargs):
-            retry = 0
-            while True:
-                if retry >= max_retries:
-                    break
-                try:
-                    return func(*args, **kwargs)
-                except Exception as e:
-                    logger.error(f"Error running the function: {e}")
-                retry = retry + 1
-                sleep(1)
-            return False
-
-        return wrapper
 
     def __init__(
         self,
@@ -335,7 +308,7 @@ class DockerContainerDaemon:
         try:
             return self._docker_exec(cmd, envs=env)
         except Exception as e:
-            logger.error(f"Error running command: {e}")
+            logger.error("Error running command: %s", e)
         return False
 
     def terminate(self) -> bool:
