@@ -73,7 +73,7 @@ test-ci:
         pip install -r requirements-dev.txt && \
         cd $pwd && \
         rm -rf data || true && \
-        mkdir -p data
+        mkdir -p data && \
         export DATABASE_URL="sqlite:///$pwd/data/test_db" && \
         export PYTHONPATH=$pwd/src && \
         export ENVIRONMENT=development && \
