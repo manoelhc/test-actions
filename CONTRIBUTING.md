@@ -41,7 +41,7 @@ If you want to understand more about what the pre-commit hooks do, you can explo
 ### VSCode useful extensions
 
 * Python
-* Gihub Copilot (mainly for documentation)
+* GitHub Copilot (mainly for documentation)
 * Bandit (security)
 * Pylance (Python language server)
 * Python Debugger
