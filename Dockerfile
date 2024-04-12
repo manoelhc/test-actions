@@ -18,7 +18,7 @@ RUN pip install --cache-dir=/tmp -r requirements.txt --target=/packages
 RUN python -m compileall .
 
 # Final
-FROM gcr.io/distroless/python3-debian12@sha256:538f54b8d704c29137d337aeac1bfc874afd7db813b163b585366d57ec113e13
+FROM gcr.io/distroless/python3-debian12@sha256:22a48ea7c898642dee832615db15dd3372b652ecd5dfa0b3f795ac3c9312aba2
 LABEL org.opencontainers.image.source="https://github.com/GoogleContainerTools/distroless"
 LABEL org.opencontainers.image.description="Google Distroless Python3 Debian 12"
 WORKDIR /app
