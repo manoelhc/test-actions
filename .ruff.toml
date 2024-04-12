@@ -2,4 +2,6 @@ exclude = [
     "packages",
 ]
 target-version = 3.12
+
+[lint]
 fixable = ["ALL"]
