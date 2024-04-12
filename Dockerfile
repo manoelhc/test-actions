@@ -1,5 +1,5 @@
 # Builder
-FROM python@sha256:b4b901d9304f0b4af0157eb021300eb4775a3af8fdbd3e9504dbfd4be16e9ee3 AS builder
+FROM python@sha256:c6751fa575260522ca11fbad88394e12cbe31d0d8951d3d29301192745a09aab AS builder
 LABEL org.opencontainers.image.source="https://github.com/docker-library/python"
 LABEL org.opencontainers.image.description="Python 3.12.0"
 WORKDIR /app
@@ -18,13 +18,11 @@ RUN pip install --cache-dir=/tmp -r requirements.txt --target=/packages
 RUN python -m compileall .
 
 # Final
-FROM gcr.io/distroless/python3-debian12@sha256:538f54b8d704c29137d337aeac1bfc874afd7db813b163b585366d57ec113e13
-LABEL org.opencontainers.image.source="https://github.com/GoogleContainerTools/distroless"
-LABEL org.opencontainers.image.description="Google Distroless Python3 Debian 12"
+FROM python@sha256:c6751fa575260522ca11fbad88394e12cbe31d0d8951d3d29301192745a09aab
 WORKDIR /app
 COPY --from=builder --chown=root:root /packages /packages
 COPY --from=builder --chown=root:root /app /app
 ENV PYTHONPATH=/packages
-USER nonroot
+USER nobody
 HEALTHCHECK --interval=5s --timeout=30s --start-period=2s --retries=3 CMD [ "python", "docker_healthcheck.py" ]
-CMD ["app.py"]
+CMD ["python", "/app/app.py"]
