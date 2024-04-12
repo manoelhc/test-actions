@@ -29,10 +29,9 @@ We welcome contributions to this project. To start contributing, follow these st
 8. Create a branch for your changes: `git checkout -b feat/my-branch`. Please use `feat/` for new features, `fix/` for bug fixes, `chore/` for maintenance tasks, and `docs/` for documentation changes.
 9. Make your changes.
 10. Run the tests: `just test`
-11. Once everything looks fine, commit your changes. Please follow the commit message conventions: https://www.conventionalcommits.org/en/v1.0.0/. When you try to commit, the pre-commit hooks will run and check your code. If there are any issues, please fix them and commit again.
+11. Once everything looks fine, commit your changes. Please follow the commit message conventions: <https://www.conventionalcommits.org/en/v1.0.0/>. When you try to commit, the pre-commit hooks will run and check your code. If there are any issues, please fix them and commit again.
 12. Push your changes to your fork: `git push origin feat/my-branch`
 13. Create a pull request.
-
 
 I recommend using the `just` command line tool to run the most common commands. You can see the available commands by running `just --list`.
 You also can explore the `justfile` to see the available commands and read the comments to understand what each command does. The `justfile` is located at the root of the repository and its format is very similar to a `Makefile`.
@@ -41,8 +40,8 @@ If you want to understand more about what the pre-commit hooks do, you can explo
 
 ### VSCode useful extensions
 
-- Python
-- Gihub Copilot (mainly for documentation)
-- Bandit (security)
-- Pylance (Python language server)
-- Python Debugger
+* Python
+* Gihub Copilot (mainly for documentation)
+* Bandit (security)
+* Pylance (Python language server)
+* Python Debugger

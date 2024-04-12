@@ -21,7 +21,7 @@ def delete_db_and_tables():
         None
 
     """
-    print(f"Deleting database and tables for {config.DATABASE_URL}")
+    print("Deleting database and tables...")
     SQLModel.metadata.drop_all(engine)
     print("Database deleted")
 
@@ -41,7 +41,7 @@ def create_db_and_tables():
         None
 
     """
-    print(f"Creating database and tables for {config.DATABASE_URL}")
+    print("Deleting database and tables...")
     SQLModel.metadata.create_all(engine)
     print("Database created")
 
