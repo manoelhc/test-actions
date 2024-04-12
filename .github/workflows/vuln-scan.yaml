@@ -2,7 +2,7 @@ name: Check for Vulnerabilities
 on:
   push:
     branches:
-      - main
+      - fix/12-zap-api-scan-report
 jobs:
   test:
     env:
