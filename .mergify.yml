@@ -4,6 +4,7 @@ pull_request_rules:
       - label=dependencies
       - check-success=Build
       - author=dependabot[bot]
+      - "#approved-reviews-by>=1"
     actions:
       merge:
         method: squash
