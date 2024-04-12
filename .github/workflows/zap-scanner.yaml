@@ -2,7 +2,7 @@ name: ZAP Scan
 on:
   push:
     branches:
-      - main
+      - fix/12-zap-api-scan-report
 permissions:
   issues: write
 jobs:
