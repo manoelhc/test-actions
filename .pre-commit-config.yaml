@@ -23,7 +23,7 @@ repos:
   hooks:
     # Run the linter.
     - id: ruff
-      args: [ --fix ]
+      args: [ --fix , --exclude, packages ]
     # Run the formatter.
     - id: ruff-format
 # This ones checks all the basic stuff. Like trailing whitespaces, end of file, yaml syntax, debug statements, etc.
