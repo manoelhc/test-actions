@@ -20,8 +20,8 @@ We welcome contributions to this project. To start contributing, follow these st
 ### Basic development environment setup
 
 1. Fork the repository
-2. Install conda or miniconda: <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>
-3. Install just: <https://github.com/casey/just>
+2. Install just: <https://github.com/casey/just>
+3. Install conda or miniconda: <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>. You can also use `just install-dev` to install conda for Linux.
 4. Create the conda environment: `conda env create -f conda/env.yaml`
 5. Activate the conda environment: `conda activate test-actions`
 6. Install the development requirements: `pip install -r requirements-dev.txt`
