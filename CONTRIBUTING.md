@@ -20,8 +20,8 @@ We welcome contributions to this project. To start contributing, follow these st
 ### Basic development environment setup
 
 1. Fork the repository
-2. Install conda or miniconda: https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html
-3. Install just: https://github.com/casey/just
+2. Install conda or miniconda: <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>
+3. Install just: <https://github.com/casey/just>
 4. Create the conda environment: `conda env create -f conda/env.yaml`
 5. Activate the conda environment: `conda activate test-actions`
 6. Install the development requirements: `pip install -r requirements-dev.txt`
@@ -36,7 +36,7 @@ We welcome contributions to this project. To start contributing, follow these st
 I recommend using the `just` command line tool to run the most common commands. You can see the available commands by running `just --list`.
 You also can explore the `justfile` to see the available commands and read the comments to understand what each command does. The `justfile` is located at the root of the repository and its format is very similar to a `Makefile`.
 
-If you want to understand more about what the pre-commit hooks do, you can explore the `.pre-commit-config.yaml` file. This file contains the configuration for the pre-commit hooks. You can see the available hooks and what they do in the pre-commit repository: https://pre-commit.com/hooks.html.
+If you want to understand more about what the pre-commit hooks do, you can explore the `.pre-commit-config.yaml` file. This file contains the configuration for the pre-commit hooks. You can see the available hooks and what they do in the pre-commit repository: <https://pre-commit.com/hooks.html>.
 
 ### VSCode useful extensions
 
