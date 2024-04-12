@@ -17,19 +17,21 @@ If you have a bug to report, a feature request, or a question, please open an is
 
 We welcome contributions to this project. To start contributing, follow these steps:
 
-0. Fork the repository
-1. Install conda or miniconda: https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html
-2. Install just: https://github.com/casey/just
-3. Create the conda environment: `conda env create -f conda/env.yaml`
-4. Activate the conda environment: `conda activate test-actions`
-5. Install the development requirements: `pip install -r requirements-dev.txt`
-6. Install the pre-commit hooks: `pre-commit install`
-7. Create a branch for your changes: `git checkout -b feat/my-branch`. Please use `feat/` for new features, `fix/` for bug fixes, `chore/` for maintenance tasks, and `docs/` for documentation changes.
-8. Make your changes.
-9. Run the tests: `just test`
-10. Once everything looks fine, commit your changes. Please follow the commit message conventions: https://www.conventionalcommits.org/en/v1.0.0/. When you try to commit, the pre-commit hooks will run and check your code. If there are any issues, please fix them and commit again.
-11. Push your changes to your fork: `git push origin feat/my-branch`
-12. Create a pull request.
+### Basic development environment setup
+
+1. Fork the repository
+2. Install conda or miniconda: https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html
+3. Install just: https://github.com/casey/just
+4. Create the conda environment: `conda env create -f conda/env.yaml`
+5. Activate the conda environment: `conda activate test-actions`
+6. Install the development requirements: `pip install -r requirements-dev.txt`
+7. Install the pre-commit hooks: `pre-commit install`
+8. Create a branch for your changes: `git checkout -b feat/my-branch`. Please use `feat/` for new features, `fix/` for bug fixes, `chore/` for maintenance tasks, and `docs/` for documentation changes.
+9. Make your changes.
+10. Run the tests: `just test`
+11. Once everything looks fine, commit your changes. Please follow the commit message conventions: https://www.conventionalcommits.org/en/v1.0.0/. When you try to commit, the pre-commit hooks will run and check your code. If there are any issues, please fix them and commit again.
+12. Push your changes to your fork: `git push origin feat/my-branch`
+13. Create a pull request.
 
 
 I recommend using the `just` command line tool to run the most common commands. You can see the available commands by running `just --list`.
