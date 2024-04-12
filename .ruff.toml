@@ -1,0 +1,5 @@
+exclude = [
+    "packages",
+]
+target-version = 3.12
+fixable = ["ALL"]

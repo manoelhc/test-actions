@@ -7,7 +7,7 @@
 *.pyo
 *.pyd
 *__pycache__*
-*.ruff*
+*.ruff_*
 data/*
 .mypy_cache
 .pytest_cache

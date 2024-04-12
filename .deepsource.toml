@@ -12,3 +12,6 @@ exclude_patterns = [
 [[analyzers]]
 name = "test-coverage"
 enabled = true
+
+[[transformers]]
+name = "ruff"
