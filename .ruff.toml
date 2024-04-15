@@ -1,7 +1,7 @@
 exclude = [
     "packages",
 ]
-target-version = 3.12
+target-version = "py312"
 
 [lint]
 fixable = ["ALL"]

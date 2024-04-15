@@ -18,6 +18,7 @@ help:
     @echo " test: Run pytest"
     @echo " test-ci: Run pytest in CI/CD pipeline and generate coverage report"
     @echo " check: Check your code before committing (pre-commit hooks)"
+    @echo " build-packages: Build Manocorp utils package"
     @echo
 
 # This target installs the project dependencies.
@@ -27,7 +28,7 @@ install-deps:
     conda init && \
     conda deactivate && \
     conda activate test-actions && \
-    pip install -e packages/localtest-docker && \
+    pip install packages/manocorp && \
     pip install -r requirements.txt && \
     pip install -r requirements-dev.txt
 
@@ -50,7 +51,11 @@ run: build
 
 # Use this command to run the application in CI/CD pipeline
 run-ci: build
-    docker run -d -p 5000:5000 -e ENVIRONMENT=development --restart=on-failure -v $pwd/data:/data test-actions
+    docker run -d -p 5000:5000 \
+        -e ENVIRONMENT=development \
+        -e HOST=0.0.0.0 \
+        --restart=on-failure \
+        -v $pwd/data:/data test-actions
 
 # Use this command to run the application in development mode in your local machine,
 # using your local source code, without the need to rebuild the image. Don't use it if you're
@@ -73,7 +78,7 @@ test: install-deps
 
 # Use this command to run pytest in CI/CD pipeline and generate coverage report
 test-ci:
-    pip install -e packages/localtest-docker && \
+    pip install --force-reinstall packages/manocorp && \
         pip install -r requirements.txt && \
         pip install -r requirements-dev.txt && \
         cd $pwd && \
@@ -88,3 +93,9 @@ test-ci:
 # Use this command to check your code before committing (pre-commit hooks)
 check:
     pre-commit run
+
+# Build packages
+build-packages:
+    cd packages/manocorp && \
+        python setup.py build && \
+        pip install .

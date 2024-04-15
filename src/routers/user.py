@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from manocorp.fastapi.routing import SecFetchJsonRoute
 from sqlalchemy.exc import IntegrityError
 from models.user import User, UserSimple, UserCreate, UserUpdate
 from sqlmodel import Session, create_engine, select
@@ -7,7 +8,11 @@ from datetime import datetime
 
 
 engine = create_engine(config.DATABASE_URL, echo=True)
-router = APIRouter()
+
+
+router = APIRouter(route_class=SecFetchJsonRoute)
+
+# Adding default headers for the API
 
 ERROR_USER_NOT_CHANGED = HTTPException(
     status_code=400,

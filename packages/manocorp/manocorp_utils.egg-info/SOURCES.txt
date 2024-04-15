@@ -1,0 +1,11 @@
+README.md
+setup.py
+manocorp/fastapi/routing/__init__.py
+manocorp/fastapi/routing/apisecroute.py
+manocorp/testing/__init__.py
+manocorp/testing/docker.py
+manocorp_utils.egg-info/PKG-INFO
+manocorp_utils.egg-info/SOURCES.txt
+manocorp_utils.egg-info/dependency_links.txt
+manocorp_utils.egg-info/requires.txt
+manocorp_utils.egg-info/top_level.txt

@@ -75,7 +75,6 @@ class DockerContainerDaemon:
             environment=env,
             ports={self._port: self._port},
         )
-
         if result:
             return True
         logger.error("Error running the container.")
