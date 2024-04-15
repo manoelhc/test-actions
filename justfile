@@ -78,7 +78,7 @@ test: install-deps
 
 # Use this command to run pytest in CI/CD pipeline and generate coverage report
 test-ci:
-    pip install -e packages/manocorp && \
+    pip install --force-reinstall packages/manocorp && \
         pip install -r requirements.txt && \
         pip install -r requirements-dev.txt && \
         cd $pwd && \

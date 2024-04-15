@@ -16,7 +16,7 @@ COPY requirements.txt /app
 WORKDIR /app
 ENV PYTHONPATH=/packages
 RUN pip install --cache-dir=/tmp -r requirements.txt --target=/packages
-RUN pip install --cache-dir=/tmp '/manocorp>=0.0.1' --target=/packages
+RUN pip install --cache-dir=/tmp /manocorp --force-reinstall --target=/packages
 RUN python -m compileall .
 
 # Final
