@@ -1,9 +1,0 @@
-Metadata-Version: 2.1
-Name: localtest_docker
-Version: 0.1.2
-Summary: A package to test Docker containers.
-Author: Manoel Carvalho
-License: MIT
-Requires-Dist: docker==7.0.0
-
-Hello!

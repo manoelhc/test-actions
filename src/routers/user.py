@@ -1,31 +1,16 @@
-from fastapi import APIRouter, HTTPException, Request, Response
-from fastapi.routing import APIRoute
+from fastapi import APIRouter, HTTPException
+from manocorp.fastapi.routing import SecFetchJsonRoute
 from sqlalchemy.exc import IntegrityError
 from models.user import User, UserSimple, UserCreate, UserUpdate
 from sqlmodel import Session, create_engine, select
 import config
 from datetime import datetime
-from collections.abc import Callable
+
 
 engine = create_engine(config.DATABASE_URL, echo=True)
 
 
-class UserRoute(APIRoute):
-    def get_route_handler(self) -> Callable:
-        original_route_handler = super().get_route_handler()
-
-        async def custom_route_handler(request: Request) -> Response:
-            response: Response = await original_route_handler(request)
-            response.headers["Content-Type"] = "application/json"
-            response.headers["Sec-Fetch-Dest"] = "json"
-            response.headers["Sec-Fetch-Site"] = "same-origin"
-            response.headers["Sec-Fetch-Mode"] = "cors"
-            return response
-
-        return custom_route_handler
-
-
-router = APIRouter(route_class=UserRoute)
+router = APIRouter(route_class=SecFetchJsonRoute)
 
 # Adding default headers for the API
 

@@ -1,6 +1,6 @@
 import pytest
 from docker_healthcheck import check_health
-from localtest_docker import DockerContainerDaemon
+from manocorp.testing import DockerContainerDaemon
 
 
 @pytest.fixture

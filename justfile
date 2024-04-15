@@ -18,6 +18,7 @@ help:
     @echo " test: Run pytest"
     @echo " test-ci: Run pytest in CI/CD pipeline and generate coverage report"
     @echo " check: Check your code before committing (pre-commit hooks)"
+    @echo " build-packages: Build Manocorp utils package"
     @echo
 
 # This target installs the project dependencies.
@@ -27,7 +28,7 @@ install-deps:
     conda init && \
     conda deactivate && \
     conda activate test-actions && \
-    pip install -e packages/localtest-docker && \
+    pip install packages/manocorp && \
     pip install -r requirements.txt && \
     pip install -r requirements-dev.txt
 
@@ -77,7 +78,7 @@ test: install-deps
 
 # Use this command to run pytest in CI/CD pipeline and generate coverage report
 test-ci:
-    pip install -e packages/localtest-docker && \
+    pip install -e packages/manocorp && \
         pip install -r requirements.txt && \
         pip install -r requirements-dev.txt && \
         cd $pwd && \
@@ -92,3 +93,9 @@ test-ci:
 # Use this command to check your code before committing (pre-commit hooks)
 check:
     pre-commit run
+
+# Build packages
+build-packages:
+    cd packages/manocorp && \
+        python setup.py build && \
+        pip install .

@@ -1,0 +1,9 @@
+Metadata-Version: 2.1
+Name: manocorp
+Version: 0.0.1
+Summary: Manocorp Utils package.
+Author: Manoel Carvalho
+License: MIT
+Requires-Dist: fastapi>=0.110.1
+
+Hello!

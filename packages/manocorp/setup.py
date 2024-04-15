@@ -8,12 +8,16 @@ def read(fname):
 
 
 setup(
-    name="localtest_docker",
-    version="0.1.2",
-    packages=["localtest_docker"],
-    install_requires=["docker==7.0.0"],
+    name="manocorp",
+    version="0.0.1",
+    packages=[
+        "manocorp",
+        "manocorp.fastapi.routing",
+        "manocorp.testing",
+    ],
+    install_requires=["fastapi>=0.110.1"],
     license="MIT",
     author="Manoel Carvalho",
-    description="A package to test Docker containers.",
+    description="Manocorp Utils package.",
     long_description=read("README.md"),
 )
