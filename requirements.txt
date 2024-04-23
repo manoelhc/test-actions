@@ -1,5 +1,5 @@
 alembic==1.13.1
-fastapi==0.110.1
+fastapi==0.110.2
 opentelemetry-distro==0.45b0
 opentelemetry-instrumentation==0.45b0
 psycopg2==2.9.9
