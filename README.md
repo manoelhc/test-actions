@@ -14,3 +14,8 @@ This is a simple project to test GitHub Actions and other tools. The project is 
 [![DeepSource](https://app.deepsource.com/gh/manoelhc/test-actions.svg/?label=resolved+issues&show_trend=true&token=mIKCccso-KAHSUB9eOIoNuBl)](https://app.deepsource.com/gh/manoelhc/test-actions/)
 [![DeepSource](https://app.deepsource.com/gh/manoelhc/test-actions.svg/?label=code+coverage&show_trend=true&token=mIKCccso-KAHSUB9eOIoNuBl)](https://app.deepsource.com/gh/manoelhc/test-actions/)
 [![Build Status](https://github.com/manoelhc/test-actions/actions/workflows/test.yaml/badge.svg)](https://github.com/manoelhc/test-actions/actions/workflows/test.yaml)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmanoelhc%2Ftest-actions.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmanoelhc%2Ftest-actions?ref=badge_shield)
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmanoelhc%2Ftest-actions.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmanoelhc%2Ftest-actions?ref=badge_large)
