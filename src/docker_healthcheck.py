@@ -6,17 +6,15 @@ import config
 
 def check_health(port: str = config.PORT, endpoint: str = "/health"):
     # skipcq: FLK-W505
-    """
-    Check the health of a service by sending a GET request to the health
+    """    Check the health of a service by sending a GET request to the health
     endpoint, inside the container.
 
     Args:
-        port (int): The port number on which the service is running.
-                    Defaults to config.PORT.
+        port (str): The port number on which the service is running. Defaults to config.PORT.
+        endpoint (str): The endpoint for health check. Defaults to "/health".
 
     Returns:
-        bool: True if the healthcheck passes (status code 200),
-              False otherwise.
+        bool: True if the healthcheck passes (status code 200), False otherwise.
     """
     url = f"{config.PROTOCOL}://{config.HOST}:{port}{endpoint}"
     retry = 0

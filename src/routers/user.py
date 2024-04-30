@@ -26,8 +26,7 @@ ERROR_BAD_REQUEST = HTTPException(status_code=400, detail="Bad request")
 
 @router.post("/user", response_model=UserSimple)
 def create_user(user: UserCreate):
-    """
-    Creates a new user.
+    """    Creates a new user.
 
     Args:
         user (UserCreate): The user data to create.
@@ -57,11 +56,10 @@ def create_user(user: UserCreate):
 
 @router.get("/users/{page}", response_model=list[UserSimple])
 def read_all_user(page: int = 1):
-    """
-    Retrieve a list of users from the database.
+    """    Retrieve a list of users from the database.
 
     Args:
-        page (int, optional): The page number to retrieve. Defaults to 1.
+        page (int?): The page number to retrieve. Defaults to 1.
 
     Returns:
         list: A list of UserSimple objects representing the users.
@@ -84,8 +82,7 @@ def read_all_user(page: int = 1):
 
 @router.get("/user/{username}", response_model=UserSimple)
 def read_user(username: str):
-    """
-    Retrieve a user by their username.
+    """    Retrieve a user by their username.
 
     Args:
         username (str): The username of the user to retrieve.
@@ -114,8 +111,9 @@ def read_user(username: str):
 
 @router.put("/user", response_model=UserSimple)
 def update_user(user_request: UserUpdate):
-    """
-    Update a user's information in the database.
+    """    Update a user's information in the database.
+
+    It updates the user's information in the database based on the provided user update request.
 
     Args:
         user_request (UserUpdate): The updated user information.
@@ -156,8 +154,7 @@ def update_user(user_request: UserUpdate):
 
 @router.delete("/user/{username}", response_model=UserSimple)
 def delete_user(username: str):
-    """
-    Deletes a user by setting their 'is_active' flag to False, appending '[deleted]'
+    """    Deletes a user by setting their 'is_active' flag to False, appending '[deleted]'
     to their username, and updating the 'deleted_at' field with the current datetime.
 
     Args:
