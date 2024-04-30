@@ -1,10 +1,10 @@
 pull_request_rules:
   - name: Automatic merge when dependencies are updated and build is successful
     conditions:
-      - label=dependencies
-      - check-success=Build
-      - author=dependabot[bot]
-      - "#approved-reviews-by>=1"
+      - and:
+        - label=dependencies
+        - author=dependabot[bot]
+        - approved-reviews-by>=1
     actions:
       merge:
         method: squash
