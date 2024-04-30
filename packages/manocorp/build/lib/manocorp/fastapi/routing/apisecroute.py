@@ -19,7 +19,7 @@ class SecFetchJsonRoute(APIRoute):
 
             This function takes a request object, processes it using the original route handler, and then modifies the response
             headers to include specific values for 'Content-Type', 'X-Content-Type-Options', 'Sec-Fetch-Dest', 'Sec-Fetch-Site',
-            'Sec-Fetch-Mode', 'Cache-Control', 'Pragma', and 'Expires'.
+            'Sec-Fetch-Mode', 'Cache-Control', 'Pragma', and 'Expires.
 
             Args:
                 request (Request): The request object to be processed.

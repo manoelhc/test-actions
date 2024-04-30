@@ -74,11 +74,11 @@ class DockerContainerDaemon:
     def _docker_exec(self, cmd: list[str], envs: dict[str, str]) -> bool:
         """        Execute a command inside a Docker container.
 
-        This method executes a command inside a Docker container using the specified environment variables.
+        This method executes a command inside a Docker container using the specified command and environment variables.
 
         Args:
             cmd (list[str]): A list of strings representing the command to be executed.
-            envs (dict[str, str]): A dictionary of environment variables to be set for the command execution.
+            envs (dict[str, str]): A dictionary of environment variables to be set for the command.
 
         Returns:
             bool: True if the command was executed successfully, False otherwise.
@@ -114,8 +114,6 @@ class DockerContainerDaemon:
     def check_if_object_exists(name: str) -> bool:
         """        Check if a Docker object exists.
 
-        It checks if a Docker container or image with the given name exists.
-
         Args:
             name (str): The name of the Docker object.
 
@@ -123,7 +121,7 @@ class DockerContainerDaemon:
             bool: True if the Docker object exists, False otherwise.
 
         Raises:
-            docker.errors.APIError: If an error occurs while checking the existence of the Docker object.
+            docker.errors.APIError: If an error occurs while checking if the object exists.
         """
         try:
             client = docker.from_env()
@@ -148,8 +146,8 @@ class DockerContainerDaemon:
         def is_port_in_use(port):
             """            Check if a port is in use on the local machine.
 
-            This function creates a socket connection to the localhost on the specified port
-            and checks if the connection is successful.
+            This function creates a socket and attempts to connect to the specified port on the localhost.
+            If the connection is successful, it means the port is in use.
 
             Args:
                 port (int): The port number to check for availability.
@@ -174,6 +172,9 @@ class DockerContainerDaemon:
 
         Returns:
             str: The next available image name.
+
+        Notes:
+            This function generates a unique image name by calling DockerContainerDaemon.get_hash() and ensures that the generated name is not already in use by checking against DockerContainerDaemon.image_names and calling DockerContainerDaemon.check_if_object_exists().
         """
         image_name = DockerContainerDaemon.get_hash()
         while (
@@ -193,8 +194,8 @@ class DockerContainerDaemon:
             str: The next available tag.
 
         Notes:
-            This function generates a unique tag by calling the get_hash method of DockerContainerDaemon
-            and ensures that the generated tag is not already present in the tags list of DockerContainerDaemon.
+            This function generates the next available tag by calling the get_hash method of DockerContainerDaemon
+            and ensures that the generated tag is unique by checking it against the existing tags in DockerContainerDaemon.
         """
         tag = DockerContainerDaemon.get_hash()
         while tag in DockerContainerDaemon.tags:
@@ -231,10 +232,6 @@ class DockerContainerDaemon:
             tag (str?): The tag of the Docker image.
             context (str?): The build context for the Docker image.
             dockerfile_path (str?): The path to the Dockerfile.
-
-
-        Note:
-            This method initializes a DockerContainerDaemon object with the specified parameters.
         """
 
         self._client = docker.from_env()
@@ -363,7 +360,7 @@ class DockerContainerDaemon:
         This method first terminates the container and then removes it along with its associated image if found.
 
         Returns:
-            bool: True if the container and image are successfully destroyed, False otherwise.
+            bool: True if the container and image were successfully destroyed, False otherwise.
 
         Raises:
             docker.errors.NotFound: If the container or image is not found.
