@@ -8,7 +8,6 @@ import pytest
 def client():
     """Function to set up and tear down database and
     tables for testing purposes using a test client.
-
     It first creates the necessary database and tables,
     then initializes a test client for the application.
     After the test client is used, it tears down the database
@@ -27,7 +26,6 @@ def client():
 
 def test_healthcheck(client: TestClient):
     """Perform a health check on the client.
-
     This function sends a GET request to the "/health" endpoint of
     the client and checks the response for a status code of 200 and
     a JSON object containing a "status" key with the value "ok".

@@ -5,17 +5,13 @@ from manocorp.testing import DockerContainerDaemon
 
 @pytest.fixture
 def docker_session():
-    """Setup a Docker container session for testing.
-
-    This function sets up a Docker container session using DockerContainerDaemon class,
+    """This function sets up a Docker container session using DockerContainerDaemon class,
     builds the container, starts it, and yields the session. After the session is used,
     it terminates and destroys the container.
 
     Yields:
         DockerContainerDaemon: The Docker container session.
     """
-
-    # Setup the test app.
     ds = DockerContainerDaemon()
     ds.build()
     ds.start()
