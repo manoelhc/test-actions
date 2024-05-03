@@ -16,7 +16,6 @@ def client():
     Yields:
         TestClient: A test client for the application.
     """
-
     create_db_and_tables()
     client = TestClient(app)
     yield client
@@ -38,7 +37,6 @@ def test_healthcheck(client: TestClient):
             if the "status" key is not present in the response JSON or
             if its value is not "ok".
     """
-
     response = client.get("/health")
     assert response.status_code == 200
     output = response.json()
