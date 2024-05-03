@@ -19,10 +19,11 @@ class UserCreate(SQLModel):
     @classmethod
     # skipcq: FLK-W505
     def username_check(cls, username: str):
-        """        Validates the username attribute.
+        """Validates the username attribute.
 
-        It validates the username attribute by stripping leading and trailing whitespace, converting it to lowercase,
-        and checking its length and characters.
+        It validates the username attribute by stripping leading
+            and trailing whitespace, converting it to lowercase,
+            and checking its length and characters.
 
         Args:
             cls: The class instance.
@@ -32,7 +33,8 @@ class UserCreate(SQLModel):
             str: The validated username.
 
         Raises:
-            ValueError: If the username is less than 2 characters or contains non-alphanumeric characters.
+            ValueError: If the username is less than 2 characters or
+                contains non-alphanumeric characters.
         """
         username = username.strip().lower()
         if len(username) <= 2:

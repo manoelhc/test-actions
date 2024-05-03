@@ -6,10 +6,13 @@ import pytest
 
 @pytest.fixture
 def client():
-    """    Function to set up and tear down database and tables for testing purposes using a test client.
+    """Function to set up and tear down database and
+    tables for testing purposes using a test client.
 
-    It first creates the necessary database and tables, then initializes a test client for the application.
-    After the test client is used, it tears down the database and tables and closes the client.
+    It first creates the necessary database and tables,
+    then initializes a test client for the application.
+    After the test client is used, it tears down the database
+    and tables and closes the client.
 
     Yields:
         TestClient: A test client for the application.
@@ -23,15 +26,19 @@ def client():
 
 
 def test_healthcheck(client: TestClient):
-    """    Perform a health check on the client.
+    """Perform a health check on the client.
 
-    This function sends a GET request to the "/health" endpoint of the client and checks the response for a status code of 200 and a JSON object containing a "status" key with the value "ok".
+    This function sends a GET request to the "/health" endpoint of
+    the client and checks the response for a status code of 200 and
+    a JSON object containing a "status" key with the value "ok".
 
     Args:
         client (TestClient): The client to perform the health check on.
 
     Raises:
-        AssertionError: If the response status code is not 200 or if the "status" key is not present in the response JSON or if its value is not "ok".
+        AssertionError: If the response status code is not 200 or
+            if the "status" key is not present in the response JSON or
+            if its value is not "ok".
     """
 
     response = client.get("/health")

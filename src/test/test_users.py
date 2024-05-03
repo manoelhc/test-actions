@@ -6,10 +6,11 @@ import pytest
 
 @pytest.fixture
 def client():
-    """    Creates a client for testing purposes.
+    """Creates a client for testing purposes.
 
-    This function creates a database and tables, seeds the database, creates a TestClient for the application,
-    yields the client for testing, deletes the database and tables, and closes the client.
+    This function creates a database and tables, seeds the database,
+    creates a TestClient for the application, yields the client for testing,
+    deletes the database and tables, and closes the client.
 
     Yields:
         TestClient: A client for testing the application.
@@ -24,16 +25,19 @@ def client():
 
 
 def test_create_user(client: TestClient):
-    """    Test the creation of a new user.
+    """Test the creation of a new user.
 
-    This function sends a POST request to create a new user with the provided username and asserts the response status code and the presence of specific keys in the response JSON.
+    This function sends a POST request to create a new user with the provided
+    username and asserts the response status code and the presence of
+    specific keys in the response JSON.
 
     Args:
         client (TestClient): The testing client for making HTTP requests.
 
 
     Raises:
-        AssertionError: If the response status code is not 200 or if any of the expected keys are missing in the response JSON.
+        AssertionError: If the response status code is not 200 or if any
+            of the expected keys are missing in the response JSON.
     """
 
     # Test new user creation
@@ -47,9 +51,10 @@ def test_create_user(client: TestClient):
 
 
 def test_invalid_users(client: TestClient):
-    """    Test the validation of invalid user names.
+    """Test the validation of invalid user names.
 
-    This function sends POST requests with various invalid usernames to the '/user' endpoint and asserts that the response status code is 422.
+    This function sends POST requests with various invalid usernames to
+    the '/user' endpoint and asserts that the response status code is 422.
 
     Args:
         client (TestClient): The test client for making HTTP requests.
@@ -75,16 +80,21 @@ def test_invalid_users(client: TestClient):
 
 
 def test_duplicate_user(client: TestClient):
-    """    Test duplicate user creation.
+    """Test duplicate user creation.
 
-    This function tests the creation of a duplicate user by sending a POST request to the "/user" endpoint with a username. It asserts that the response status code is 200 for the first request and 400 for the second request, indicating a duplicate user creation attempt. It also checks if the response JSON contains the "detail" key.
+    This function tests the creation of a duplicate user by sending a POST
+    request to the "/user" endpoint with a username. It asserts that the
+    response status code is 200 for the first request and 400 for the
+    second request, indicating a duplicate user creation attempt.
+    It also checks if the response JSON contains the "detail" key.
 
     Args:
         client (TestClient): An instance of TestClient used for making HTTP requests.
 
 
     Raises:
-        AssertionError: If the response status code is not as expected or if the "detail" key is not present in the response JSON.
+        AssertionError: If the response status code is not as expected
+            or if the "detail" key is not present in the response JSON.
     """
 
     # Test duplicate user creation
@@ -97,10 +107,12 @@ def test_duplicate_user(client: TestClient):
 
 
 def test_user_not_found(client: TestClient):
-    """    Test if the user is not found.
+    """Test if the user is not found.
 
-    This function tests the scenario when a user is not found by making a GET request to the endpoint "/user/terminator".
-    It asserts that the response status code is 404 and checks if the response JSON contains the key "detail".
+    This function tests the scenario when a user is not found by
+    making a GET request to the endpoint "/user/terminator".
+    It asserts that the response status code is 404 and checks if the
+    response JSON contains the key "detail".
 
     Args:
         client (TestClient): The test client for making HTTP requests.
@@ -114,7 +126,7 @@ def test_user_not_found(client: TestClient):
 
 
 def test_read_user(client: TestClient):
-    """    Test the functionality to read a user from the server.
+    """Test the functionality to read a user from the server.
 
     Args:
         client (TestClient): The testing client for making requests.
@@ -137,17 +149,20 @@ def test_read_user(client: TestClient):
 
 
 def test_read_user_not_found(client: TestClient):
-    """    Test the scenario when the user is not found.
+    """Test the scenario when the user is not found.
 
-    This function sends a GET request to retrieve user information with a non-existent user ID.
-    It then asserts that the response status code is 404 and checks if the response JSON contains the "detail" key.
+    This function sends a GET request to retrieve user information
+    with a non-existent user ID. It then asserts that the response
+    status code is 404 and checks if the response JSON contains the
+    "detail" key.
 
     Args:
         client (TestClient): The testing client for making HTTP requests.
 
 
     Raises:
-        AssertionError: If the response status code is not 404 or if the "detail" key is not present in the response JSON.
+        AssertionError: If the response status code is not 404 or
+            if the "detail" key is not present in the response JSON.
     """
 
     # Test user not found
@@ -158,9 +173,11 @@ def test_read_user_not_found(client: TestClient):
 
 
 def test_enabling_disabling_user(client: TestClient):
-    """    Test enabling and disabling a user.
+    """Test enabling and disabling a user.
 
-    This function tests the enabling and disabling of a user by making various HTTP requests to the server and asserting the response status codes and JSON outputs.
+    This function tests the enabling and disabling of a user by making
+    various HTTP requests to the server and asserting the response
+    status codes and JSON outputs.
 
     Args:
         client (TestClient): An instance of TestClient used for making HTTP requests.
@@ -216,9 +233,10 @@ def test_enabling_disabling_user(client: TestClient):
 
 
 def test_changing_user_name(client: TestClient):
-    """    Test changing the username of a user.
+    """Test changing the username of a user.
 
-    This function tests the process of changing the username of a user by making various API requests and assertions.
+    This function tests the process of changing the username of a
+    user by making various API requests and assertions.
 
     Args:
         client (TestClient): An instance of TestClient for making API requests.
@@ -313,10 +331,11 @@ def test_changing_user_name(client: TestClient):
 
 
 def test_delete_users(client: TestClient):
-    """    Test the deletion of users.
+    """Test the deletion of users.
 
-    This function tests the deletion of users by sending delete requests to the server for each user.
-    It also verifies that the users are successfully deleted by checking their status codes.
+    This function tests the deletion of users by sending delete requests
+    to the server for each user. It also verifies that the users are
+    successfully deleted by checking their status codes.
 
     Args:
         client (TestClient): The testing client for making HTTP requests.
@@ -344,9 +363,11 @@ def test_delete_users(client: TestClient):
 
 
 def test_read_all_users(client: TestClient):
-    """    Test the functionality to read all users.
+    """Test the functionality to read all users.
 
-    This function tests the functionality to read all users by performing various operations such as deleting users, generating new users, and then retrieving and verifying the user details.
+    This function tests the functionality to read all users by performing various
+    operations such as deleting users, generating new users, and then
+    retrieving and verifying the user details.
 
     Args:
         client (TestClient): An instance of TestClient for making HTTP requests.

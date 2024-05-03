@@ -5,7 +5,7 @@ from manocorp.testing import DockerContainerDaemon
 
 @pytest.fixture
 def docker_session():
-    """    Setup a Docker container session for testing.
+    """Setup a Docker container session for testing.
 
     This function sets up a Docker container session using DockerContainerDaemon class,
     builds the container, starts it, and yields the session. After the session is used,
@@ -25,7 +25,7 @@ def docker_session():
 
 
 def test_check_health(docker_session: DockerContainerDaemon):
-    """    Test the check_health function.
+    """Test the check_health function.
 
     Args:
         docker_session (DockerContainerDaemon): An instance of DockerContainerDaemon
@@ -35,7 +35,7 @@ def test_check_health(docker_session: DockerContainerDaemon):
 
 
 def test_check_invalid_port_endpoint(docker_session: DockerContainerDaemon):
-    """    Test case for checking an invalid health endpoint (Port).
+    """Test case for checking an invalid health endpoint (Port).
 
     Args:
         docker_session (DockerContainerDaemon): The Docker container daemon session.
@@ -44,7 +44,7 @@ def test_check_invalid_port_endpoint(docker_session: DockerContainerDaemon):
 
 
 def test_check_invalid_host_endpoint(docker_session: DockerContainerDaemon):
-    """    Test case for checking an invalid health endpoint (Hostname).
+    """Test case for checking an invalid health endpoint (Hostname).
 
     Args:
         docker_session (DockerContainerDaemon): The Docker container daemon session.
@@ -56,7 +56,7 @@ def test_check_invalid_host_endpoint(docker_session: DockerContainerDaemon):
 
 
 def test_check_invalid_path_endpoint(docker_session: DockerContainerDaemon):
-    """    Test case for checking an invalid health endpoint (Endpoint).
+    """Test case for checking an invalid health endpoint (Endpoint).
 
     Args:
         docker_session (DockerContainerDaemon): The Docker container daemon session.
@@ -65,7 +65,7 @@ def test_check_invalid_path_endpoint(docker_session: DockerContainerDaemon):
 
 
 def test_check_health_calling_the_file(docker_session: DockerContainerDaemon):
-    """    Test the check_health function by running the file.
+    """Test the check_health function by running the file.
 
     Args:
         docker_session (DockerContainerDaemon): The Docker container session.
@@ -74,7 +74,7 @@ def test_check_health_calling_the_file(docker_session: DockerContainerDaemon):
 
 
 def test_check_invalid_file(docker_session: DockerContainerDaemon):
-    """    Test if docker exec fails when running an invalid file to avoid false positives.
+    """Test if docker exec fails when running an invalid file to avoid false positives.
 
     Args:
         docker_session (DockerContainerDaemon): The Docker container session to run the test on.
@@ -83,7 +83,7 @@ def test_check_invalid_file(docker_session: DockerContainerDaemon):
 
 
 def test_check_health_calling_the_module(docker_session: DockerContainerDaemon):
-    """    Test the check_health function by running the module.
+    """Test the check_health function by running the module.
 
     Args:
         docker_session (DockerContainerDaemon): The Docker container session.
