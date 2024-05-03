@@ -113,7 +113,8 @@ def read_user(username: str):
 def update_user(user_request: UserUpdate):
     """Update a user's information in the database.
 
-    It updates the user's information in the database based on the provided user update request.
+    It updates the user's information in the database based on the provided
+    user update request.
 
     Args:
         user_request (UserUpdate): The updated user information.
