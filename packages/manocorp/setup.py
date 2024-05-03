@@ -4,6 +4,18 @@ from setuptools import setup
 
 
 def read(fname):
+    """    Read the contents of a file.
+
+    Args:
+        fname (str): The name of the file to be read.
+
+    Returns:
+        str: The contents of the file.
+
+    Raises:
+        FileNotFoundError: If the specified file does not exist.
+    """
+
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 

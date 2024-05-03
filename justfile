@@ -31,6 +31,7 @@ install-deps:
     pip install packages/manocorp && \
     pip install -r requirements.txt && \
     pip install -r requirements-dev.txt
+    go install github.com/google/addlicense@latest
 
 # This target installs the development dependencies.
 install-dev:

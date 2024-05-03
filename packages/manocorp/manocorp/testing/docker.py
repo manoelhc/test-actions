@@ -28,18 +28,10 @@ class DockerContainerDaemon:
     container_names = []
 
     def _docker_build(self) -> bool:
-        """
-        Execute a system command.
-
-        Args:
-            cmd (list): The command to be executed.
-            timeout (int): The timeout for the command execution
-                           (default is 5 seconds).
-            envs (dict): Additional environment variables for the command execution
-                         (default is an empty dictionary).
+        """        Execute a Docker build command.
 
         Returns:
-            bool: True if the command execution is successful, False otherwise.
+            bool: True if the Docker build is successful, False otherwise.
         """
         image = self._client.images.build(
             path=self._context,
@@ -51,15 +43,14 @@ class DockerContainerDaemon:
         return False
 
     def _docker_run(self) -> bool:
-        """
-        Execute a system command.
+        """        Execute a system command.
 
         Args:
             cmd (list): The command to be executed.
             timeout (int): The timeout for the command execution
-                           (default is 5 seconds).
+                (default is 5 seconds).
             envs (dict): Additional environment variables for the command execution
-                         (default is an empty dictionary).
+                (default is an empty dictionary).
 
         Returns:
             bool: True if the command execution is successful, False otherwise.
@@ -81,6 +72,18 @@ class DockerContainerDaemon:
         return False
 
     def _docker_exec(self, cmd: list[str], envs: dict[str, str]) -> bool:
+        """        Execute a command inside a Docker container.
+
+        This method executes a command inside a Docker container using the specified command and environment variables.
+
+        Args:
+            cmd (list[str]): A list of strings representing the command to be executed.
+            envs (dict[str, str]): A dictionary of environment variables to be set for the command execution.
+
+        Returns:
+            bool: True if the command was executed successfully, False otherwise.
+        """
+
         container = self._client.containers.get(self._container_name)
         if container:
             result = container.exec_run(cmd=" ".join(cmd), environment=envs)
@@ -95,8 +98,7 @@ class DockerContainerDaemon:
 
     @staticmethod
     def get_hash():
-        """
-        Generate a random hash.
+        """        Generate a random hash.
 
         Returns:
             str: The generated hash.
@@ -110,14 +112,18 @@ class DockerContainerDaemon:
 
     @staticmethod
     def check_if_object_exists(name: str) -> bool:
-        """
-        Check if a Docker object exists.
+        """        Check if a Docker object exists.
+
+        It checks if a Docker container or image with the given name exists.
 
         Args:
             name (str): The name of the Docker object.
 
         Returns:
             bool: True if the Docker object exists, False otherwise.
+
+        Raises:
+            docker.errors.APIError: If an error occurs while checking the existence of the Docker object.
         """
         try:
             client = docker.from_env()
@@ -133,14 +139,24 @@ class DockerContainerDaemon:
 
     @staticmethod
     def get_next_port():
-        """
-        Get the next available port.
+        """        Get the next available port.
 
         Returns:
             int: The next available port.
         """
 
         def is_port_in_use(port):
+            """            Check if a port is in use on the local machine.
+
+            This function creates a socket connection to the localhost and checks if the specified port is in use.
+
+            Args:
+                port (int): The port number to be checked.
+
+            Returns:
+                bool: True if the port is in use, False otherwise.
+            """
+
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 return s.connect_ex(("localhost", port)) == 0
 
@@ -153,11 +169,13 @@ class DockerContainerDaemon:
 
     @staticmethod
     def get_next_image_name():
-        """
-        Get the next available image name.
+        """        Get the next available image name.
 
         Returns:
             str: The next available image name.
+
+        Notes:
+            This function generates a unique image name by calling DockerContainerDaemon.get_hash() and ensures that the generated name is not already in use by checking against DockerContainerDaemon.image_names and using DockerContainerDaemon.check_if_object_exists().
         """
         image_name = DockerContainerDaemon.get_hash()
         while (
@@ -171,11 +189,14 @@ class DockerContainerDaemon:
 
     @staticmethod
     def get_next_tag():
-        """
-        Get the next available tag.
+        """        Get the next available tag.
 
         Returns:
             str: The next available tag.
+
+        Notes:
+            This function generates a unique tag by calling the get_hash method of DockerContainerDaemon
+            and appends it to the tags list until a unique tag is found.
         """
         tag = DockerContainerDaemon.get_hash()
         while tag in DockerContainerDaemon.tags:
@@ -185,11 +206,14 @@ class DockerContainerDaemon:
 
     @staticmethod
     def get_next_container_name():
-        """
-        Get the next available container name.
+        """        Get the next available container name.
 
         Returns:
             str: The next available container name.
+
+        Notes:
+            This function generates a unique container name by calling the get_hash method of DockerContainerDaemon
+            and ensures that the generated name is not already in use by checking it against the existing container names.
         """
         container_name = DockerContainerDaemon.get_hash()
         while container_name in DockerContainerDaemon.container_names:
@@ -205,6 +229,16 @@ class DockerContainerDaemon:
         context: str = ".",
         dockerfile_path: str = "./Dockerfile",
     ) -> None:
+        """        Initialize a DockerContainerDaemon object.
+
+        Args:
+            port (int?): The port number to expose on the container.
+            image_name (str?): The name of the Docker image.
+            tag (str?): The tag of the Docker image.
+            context (str?): The build context for the Docker image.
+            dockerfile_path (str?): The path to the Dockerfile.
+        """
+
         self._client = docker.from_env()
         """
         Initialize a DockerContainerDaemon object.
@@ -235,8 +269,7 @@ class DockerContainerDaemon:
         )
 
     def build(self) -> bool:
-        """
-        Builds a Docker container using the specified Dockerfile and context.
+        """        Builds a Docker container using the specified Dockerfile and context.
 
         Returns:
             bool: True if the build was successful, False otherwise.
@@ -244,8 +277,7 @@ class DockerContainerDaemon:
         return self._docker_build()
 
     def start(self):
-        """
-        Start the Docker container.
+        """        Start the Docker container.
 
         Returns:
             bool: True if the container is started successfully, False otherwise.
@@ -258,8 +290,7 @@ class DockerContainerDaemon:
         return False
 
     def is_running(self) -> bool:
-        """
-        Check if the Docker container is running.
+        """        Check if the Docker container is running.
 
         Returns:
             bool: True if the container is running, False otherwise.
@@ -275,8 +306,7 @@ class DockerContainerDaemon:
         return False
 
     def get_port(self):
-        """
-        Get the port of the Docker container.
+        """        Get the port of the Docker container.
 
         Returns:
             int: The port of the container.
@@ -284,16 +314,18 @@ class DockerContainerDaemon:
         return self._port
 
     def run(self, cmd: list[str], env: dict[str, str] = None):
-        """
-        Executes a command within a Docker container.
+        """        Executes a command within a Docker container.
 
         Args:
             cmd (list[str]): The command to be executed.
-            env (dict[str, str], optional): Environment variables to be set for
-                                            the command execution. Defaults to None.
+            env (dict[str, str]?): Environment variables to be set for
+                the command execution. Defaults to None.
 
         Returns:
             bool: True if the command execution is successful, False otherwise.
+
+        Raises:
+            Exception: If an error occurs during the command execution.
         """
         defaults = {
             "HOST": "0.0.0.0",  # nosec: B104
@@ -309,11 +341,13 @@ class DockerContainerDaemon:
         return False
 
     def terminate(self) -> bool:
-        """
-        Terminate the Docker container.
+        """        Terminate the Docker container.
 
         Returns:
             bool: True if the container is terminated successfully, False otherwise.
+
+        Raises:
+            docker.errors.NotFound: If the container is not found.
         """
         # Shutdown the app
         try:
@@ -326,6 +360,17 @@ class DockerContainerDaemon:
             return False
 
     def destroy(self) -> bool:
+        """        Destroy the container and its associated image.
+
+        This method first terminates the container and then removes it along with its associated image if present.
+
+        Returns:
+            bool: True if the container and image are successfully destroyed, False otherwise.
+
+        Raises:
+            docker.errors.NotFound: If the container or image is not found.
+        """
+
         self.terminate()
         try:
             container = self._client.containers.get(self._container_name)

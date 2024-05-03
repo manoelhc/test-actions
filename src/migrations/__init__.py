@@ -7,19 +7,11 @@ engine = create_engine(config.DATABASE_URL)
 
 
 def delete_db_and_tables():
-    """
-    Deletes the database and tables for the specified database URL.
+    """Deletes the database and tables for the specified database URL.
 
     This function deletes the database and tables based on the provided
     database URL. It uses the `SQLModel.metadata.drop_all` method to drop the
     tables defined in the SQLAlchemy models.
-
-    Args:
-        None
-
-    Returns:
-        None
-
     """
     print("Deleting database and tables...")
     SQLModel.metadata.drop_all(engine)
@@ -27,19 +19,11 @@ def delete_db_and_tables():
 
 
 def create_db_and_tables():
-    """
-    Creates the database and tables for the specified database URL.
+    """Creates the database and tables for the specified database URL.
 
     This function creates the necessary database and tables based on the provided
     database URL. It uses the `SQLModel.metadata.create_all` method to create the
     tables defined in the SQLAlchemy models.
-
-    Args:
-        None
-
-    Returns:
-        None
-
     """
     print("Deleting database and tables...")
     SQLModel.metadata.create_all(engine)
@@ -47,17 +31,10 @@ def create_db_and_tables():
 
 
 def seed_db():
-    """
-    Seeds the database with a demo user.
+    """Seeds the database with a demo user.
 
     This function creates a new session, adds a demo user to the session,
     and commits the changes to the database.
-
-    Parameters:
-        None
-
-    Returns:
-        None
     """
     session = Session(engine)
     user = User(username="demo", is_active=True)
