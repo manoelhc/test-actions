@@ -1,0 +1,82 @@
+name: Create Release
+
+on:
+  pull_request:
+    types: [opened, synchronize, closed, reopened]
+    branches:
+      - main
+      - feat/*
+      - fix/*
+      - hotfix/*
+      - ci/*
+      - chore/*
+env:
+    BUMP_PATCH: ^(fix|hotfix|ci)+(\([-A-Z0-9a-z]+\))?:(.*)+$
+    BUMP_MINOR: ^(feat|chore)+(\([-A-Z0-9a-z]+\))?:(.*)+$
+    BUMP_MAJOR: ^((feat|chore|fix)+(\([-A-Z0-9a-z]+\)?)!|BREAKING CHANGE):(.*)+$
+jobs:
+  tag:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: install Semver
+      run: |
+        cargo install semver-cli
+    - name: Get changes attributes
+      id: versions
+      run: |
+       current_version=$(git describe --tags $(git rev-list --tags='v[0-9]+.[0-9]+.[0-9]+' --max-count=1 || true)|cut -dv -f2)
+       if [[ -z $current_version  ]]; then
+         current_version=0.0.0
+       fi
+       echo "current_version=$current_version" >> "$GITHUB_OUTPUT"
+
+       PR_TITLE="${{ github.event.pull_request.title }}"
+       echo "patch=$(eval '[[ "$PR_TITLE" =~ $BUMP_PATCH ]] && semver-cli ${current_version} --increment patch || true')" >> "$GITHUB_OUTPUT"
+       echo "minor=$(eval '[[ "$PR_TITLE" =~ $BUMP_MINOR ]] && semver-cli ${current_version} --increment minor || true')" >> "$GITHUB_OUTPUT"
+       echo "major=$(eval '[[ "$PR_TITLE" =~ $BUMP_MAJOR ]] && semver-cli ${current_version} --increment major || true')" >> "$GITHUB_OUTPUT"
+
+    - name: Bump version
+      if: steps.versions.outputs.current_version != ''
+      env:
+        VERSION: "${{ steps.versions.outputs.patch }}${{ steps.versions.outputs.minor }}${{ steps.versions.outputs.major }}"
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        PR_MERGED: ${{ github.event.pull_request.merged }}
+        PR_ACTION: ${{ github.event.action }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git fetch --tags origin
+
+        version=v${VERSION}
+        pr_version=pr${PR_NUMBER}
+        pr_tag_exists=$(git tag -l | grep -F ${version}-${pr_version} || true)
+
+        if [[ -n "${pr_tag_exists}" ]]; then
+          echo "The project already has the tag ${pr_tag_exists}"
+        fi
+
+        # If event is closed
+        if [[ $PR_ACTION = "closed" ]] && [[ $PR_MERGED = true ]]; then
+          git tag $version
+          git push origin $version
+          git push --delete origin ${version}-${pr_version}
+        elif [[ $PR_ACTION = "closed" ]] && [[ $PR_MERGED = false ]] && [[ -n "${pr_tag_exists}" ]]; then
+          git push --delete origin ${version}-${pr_version}
+        else
+          if [[ -n "${pr_tag_exists}" ]]; then
+            git tag -d ${version}-${pr_version}
+            git push --delete origin ${version}-${pr_version}
+          fi
+          git tag ${version}-${pr_version} $(git rev-parse --short "$GITHUB_SHA")
+          git push origin ${version}-${pr_version}
+        fi
+
+    - name: Create Release
+      if: github.event.pull_request.merged == true
+      uses: softprops/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        generate_release_notes: true
+        tag_name: "v${{ steps.versions.outputs.patch }}${{ steps.versions.outputs.minor }}${{ steps.versions.outputs.major }}"

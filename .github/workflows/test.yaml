@@ -21,15 +21,18 @@ jobs:
         run: |
           just test-ci
       - name: Upload coverage reports to Codecov
+        if: github.event.pull_request.draft == false
         uses: codecov/codecov-action@v4.3.1
         with:
             token: ${{ secrets.CODECOV_TOKEN }}
             slug: manoelhc/test-actions
       - name: SonarCloud Scan
+        if: github.event.pull_request.draft == false
         uses: SonarSource/sonarcloud-github-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       - name: DeepSource Report
+        if: github.event.pull_request.draft == false
         env:
           DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
         run: |
@@ -38,6 +41,7 @@ jobs:
           fi
           ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml
       - name: Codacy Report
+        if: github.event.pull_request.draft == false
         uses: codacy/codacy-coverage-reporter-action@v1
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
