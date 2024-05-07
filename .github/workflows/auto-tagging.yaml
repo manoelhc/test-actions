@@ -46,6 +46,8 @@ jobs:
         PR_ACTION: ${{ github.event.action }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
+        git fetch --tags origin
+
         version=v${VERSION}
         pr_version=pr${PR_NUMBER}
         pr_tag_exists=$(git tag -l | grep -F ${version}-${pr_version} || true)
