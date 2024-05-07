@@ -56,6 +56,7 @@ jobs:
         elif [[ $PR_ACTION = "closed" ]] && [[ $PR_MERGED = false ]]; then
           git push --delete origin ${version}-${pr_version}
         else
+          git push --delete origin ${version}-${pr_version}
           git tag ${version}-${pr_version} $(git rev-parse --short "$GITHUB_SHA")
           git push origin ${version}-${pr_version}
         fi
