@@ -1,0 +1,56 @@
+name: Create Release
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - closed
+      - synchronize
+      - ready_for_review
+env:
+    BUMP_PATCH: ^(fix|ci)?\([-A-Z0-9a-z]+\):(.*)+$
+    BUMP_MINOR: ^(feat|chore)?\([-A-Z0-9a-z]+\):(.*)+$
+    BUMP_MAJOR: ^((feat|chore)?\([-A-Z0-9a-z]+\)!|BREAKING CHANGE):(.*)+$
+jobs:
+  tag:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@v3
+    - name: install Semver
+      run: |
+        cargo install semver-cli
+    - name: Get changes attributes
+      id: versions
+      run: |
+       echo "current_version=$(git describe --tags $(git rev-list --tags='v[0-9]+.[0-9]+.[0-9]+' --max-count=1)|cut -dv -f2)" >> "$GITHUB_OUTPUT"
+       if [[ -z $current_version  ]]; then
+         current_version=0.0.0
+       fi
+       echo "patch=$(eval[[ "${{ github.event.pull_request.title }}" =~ ${{ env.BUMP_PATCH }} ]] && semver-cli ${current_version} --increment patch)" >> "$GITHUB_OUTPUT"
+       echo "minor=$(eval[[ "${{ github.event.pull_request.title }}" =~ ${{ env.BUMP_MINOR }} ]] && semver-cli ${current_version} --increment minor)" >> "$GITHUB_OUTPUT"
+       echo "major=$(eval[[ "${{ github.event.pull_request.title }}" =~ ${{ env.BUMP_MAJOR }} ]] && semver-cli ${current_version} --increment major)" >> "$GITHUB_OUTPUT"
+
+    - name: Bump version
+      if: steps.versions.outputs.patch
+      env:
+        VERSION: "${{ steps.versions.outputs.patch }}${{ steps.versions.outputs.minor }}${{ steps.versions.outputs.major }}"
+        PR_NUMBER: ${{ github.event.issue.number }}
+        PR_MERGED: ${{ github.event.pull_request.merged }}
+        PR_CLOSED: ${{ github.event.pull_request.closed }}
+      run: |
+        version=v$VERSION
+        pr_version=pr${PR_NUMBER}
+
+        # If event is closed
+        if [[ $PR_CLOSED = true ]] && [[ $PR_MERGED = true ]]; then
+          echo git tag $version
+          echo git push origin $version
+          echo git push --delete origin ${version}-${pr_version}
+        elif [[ $PR_CLOSED = true ]] && [[ $PR_MERGED = false ]]; then
+          echo git push --delete origin ${version}-${pr_version}
+        else
+          echo git tag ${version}-${pr_version} $(git rev-parse --short "$GITHUB_SHA")
+          echo git push origin ${version}-${pr_version}
+        fi
