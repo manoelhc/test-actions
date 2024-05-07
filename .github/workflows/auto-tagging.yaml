@@ -1,7 +1,7 @@
 name: Create Release
 
 on:
-  pull_request:
+  pull_request_target:
     types:
       - opened
       - reopened
@@ -9,9 +9,9 @@ on:
       - synchronize
       - ready_for_review
 env:
-    BUMP_PATCH: ^(fix|ci)?\([-A-Z0-9a-z]+\):(.*)+$
-    BUMP_MINOR: ^(feat|chore)?\([-A-Z0-9a-z]+\):(.*)+$
-    BUMP_MAJOR: ^((feat|chore)?\([-A-Z0-9a-z]+\)!|BREAKING CHANGE):(.*)+$
+    BUMP_PATCH: ^(fix|hotfix|ci)+(\([-A-Z0-9a-z]+\))?:(.*)+$
+    BUMP_MINOR: ^(feat|chore)+(\([-A-Z0-9a-z]+\))?:(.*)+$
+    BUMP_MAJOR: ^((feat|chore|fix)+(\([-A-Z0-9a-z]+\)?)!|BREAKING CHANGE):(.*)+$
 jobs:
   tag:
     if: github.event.pull_request.merged == true
