@@ -32,9 +32,10 @@ jobs:
        fi
        echo "current_version=$current_version" >> "$GITHUB_OUTPUT"
 
-       echo "patch=$(eval '[[ "${{ github.event.pull_request.title }}" =~ ${{ env.BUMP_PATCH }} ]] && semver-cli ${current_version} --increment patch || true')" >> "$GITHUB_OUTPUT"
-       echo "minor=$(eval '[[ "${{ github.event.pull_request.title }}" =~ ${{ env.BUMP_MINOR }} ]] && semver-cli ${current_version} --increment minor || true')" >> "$GITHUB_OUTPUT"
-       echo "major=$(eval '[[ "${{ github.event.pull_request.title }}" =~ ${{ env.BUMP_MAJOR }} ]] && semver-cli ${current_version} --increment major || true')" >> "$GITHUB_OUTPUT"
+       PR_TITLE="${{ github.event.pull_request.title }}"
+       echo "patch=$(eval '[[ "$PR_TITLE" =~ $BUMP_PATCH ]] && semver-cli ${current_version} --increment patch || true')" >> "$GITHUB_OUTPUT"
+       echo "minor=$(eval '[[ "$PR_TITLE" =~ $BUMP_MINOR ]] && semver-cli ${current_version} --increment minor || true')" >> "$GITHUB_OUTPUT"
+       echo "major=$(eval '[[ "$PR_TITLE" =~ $BUMP_MAJOR ]] && semver-cli ${current_version} --increment major || true')" >> "$GITHUB_OUTPUT"
 
     - name: Bump version
       if: steps.versions.outputs.current_version != ''
