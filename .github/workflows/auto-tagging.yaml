@@ -19,7 +19,7 @@ jobs:
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: install Semver
       run: |
         cargo install semver-cli
@@ -62,13 +62,9 @@ jobs:
 
     - name: Create Release
       if: github.event.pull_request.merged == true
-      uses: actions/create-release@v1
+      uses: softprops/action-gh-release@v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
+        generate_release_notes: true
         tag_name: "v${{ steps.versions.outputs.patch }}${{ steps.versions.outputs.minor }}${{ steps.versions.outputs.major }}"
-        release_name: "Release v${{ github.run_number }}"
-        body: |
-          Release of the main branch at ${{ github.sha }}
-        draft: false
-        prerelease: false
