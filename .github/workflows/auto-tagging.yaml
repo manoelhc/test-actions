@@ -46,9 +46,9 @@ jobs:
         PR_ACTION: ${{ github.event.action }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        version=v$VERSION
+        version=v${VERSION}
         pr_version=pr${PR_NUMBER}
-        pr_tag_exists=$(git tag -l | grep ${version}-${pr_version})
+        pr_tag_exists=$(git tag -l | grep -F ${version}-${pr_version} || true)
 
         # If event is closed
         if [[ $PR_ACTION = "closed" ]] && [[ $PR_MERGED = true ]]; then
