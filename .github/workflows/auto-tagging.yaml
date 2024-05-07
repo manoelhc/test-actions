@@ -47,14 +47,14 @@ jobs:
 
         # If event is closed
         if [[ $PR_CLOSED = true ]] && [[ $PR_MERGED = true ]]; then
-          echo git tag $version
-          echo git push origin $version
-          echo git push --delete origin ${version}-${pr_version}
+          git tag $version
+          git push origin $version
+          git push --delete origin ${version}-${pr_version}
         elif [[ $PR_ACTION = "closed" ]] && [[ $PR_MERGED = false ]]; then
-          echo git push --delete origin ${version}-${pr_version}
+          git push --delete origin ${version}-${pr_version}
         else
-          echo git tag ${version}-${pr_version} $(git rev-parse --short "$GITHUB_SHA")
-          echo git push origin ${version}-${pr_version}
+          git tag ${version}-${pr_version} $(git rev-parse --short "$GITHUB_SHA")
+          git push origin ${version}-${pr_version}
         fi
 
     - name: Create Release
