@@ -1,8 +1,7 @@
 name: Create Release
-
 on:
   pull_request:
-    types: [opened, synchronize, closed]
+    types: [opened, synchronize, closed, reopened]
     branches:
       - main
       - feat/*
