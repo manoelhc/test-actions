@@ -1,13 +1,10 @@
 name: Create Release
 
 on:
-  pull_request_target:
-    types:
-      - opened
-      - reopened
-      - closed
-      - synchronize
-      - ready_for_review
+  pull_request:
+    types: [opened, synchronize, closed]
+    branches:
+      - main
 env:
     BUMP_PATCH: ^(fix|hotfix|ci)+(\([-A-Z0-9a-z]+\))?:(.*)+$
     BUMP_MINOR: ^(feat|chore)+(\([-A-Z0-9a-z]+\))?:(.*)+$
@@ -33,12 +30,12 @@ jobs:
        echo "major=$(eval[[ "${{ github.event.pull_request.title }}" =~ ${{ env.BUMP_MAJOR }} ]] && semver-cli ${current_version} --increment major)" >> "$GITHUB_OUTPUT"
 
     - name: Bump version
-      if: steps.versions.outputs.patch
+      if: steps.versions.outputs.current_version != ''
       env:
         VERSION: "${{ steps.versions.outputs.patch }}${{ steps.versions.outputs.minor }}${{ steps.versions.outputs.major }}"
-        PR_NUMBER: ${{ github.event.issue.number }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
         PR_MERGED: ${{ github.event.pull_request.merged }}
-        PR_CLOSED: ${{ github.event.pull_request.closed }}
+        PR_ACTION: ${{ github.event.action }}
       run: |
         version=v$VERSION
         pr_version=pr${PR_NUMBER}
@@ -48,9 +45,22 @@ jobs:
           echo git tag $version
           echo git push origin $version
           echo git push --delete origin ${version}-${pr_version}
-        elif [[ $PR_CLOSED = true ]] && [[ $PR_MERGED = false ]]; then
+        elif [[ $PR_ACTION = "closed" ]] && [[ $PR_MERGED = false ]]; then
           echo git push --delete origin ${version}-${pr_version}
         else
           echo git tag ${version}-${pr_version} $(git rev-parse --short "$GITHUB_SHA")
           echo git push origin ${version}-${pr_version}
         fi
+
+    - name: Create Release
+      if: github.event.pull_request.merged == true
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: Release v${{ github.run_number }}
+        body: |
+          Release of the main branch at ${{ github.sha }}
+        draft: false
+        prerelease: false
