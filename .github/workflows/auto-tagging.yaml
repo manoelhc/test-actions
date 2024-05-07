@@ -1,4 +1,5 @@
 name: Create Release
+
 on:
   pull_request:
     types: [opened, synchronize, closed, reopened]
@@ -15,6 +16,7 @@ env:
     BUMP_MAJOR: ^((feat|chore|fix)+(\([-A-Z0-9a-z]+\)?)!|BREAKING CHANGE):(.*)+$
 jobs:
   tag:
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -41,6 +43,7 @@ jobs:
         PR_NUMBER: ${{ github.event.pull_request.number }}
         PR_MERGED: ${{ github.event.pull_request.merged }}
         PR_ACTION: ${{ github.event.action }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         version=v$VERSION
         pr_version=pr${PR_NUMBER}
