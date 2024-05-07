@@ -1,5 +1,5 @@
 alembic==1.13.1
-fastapi==0.110.2
+fastapi==0.111.0
 opentelemetry-distro==0.45b0
 opentelemetry-instrumentation==0.45b0
 pydantic==2.7.1
@@ -9,6 +9,6 @@ python-decouple==3.8
 python-dotenv==1.0.1
 redis==5.0.4
 requests==2.31.0
-SQLAlchemy==2.0.29
-sqlmodel==0.0.16
+SQLAlchemy==2.0.30
+sqlmodel==0.0.18
 uvicorn==0.29.0
