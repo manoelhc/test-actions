@@ -50,6 +50,8 @@ jobs:
         pr_version=pr${PR_NUMBER}
         pr_tag_exists=$(git tag -l | grep -F ${version}-${pr_version} || true)
 
+        echo "The project already has the tag $pr_tag_exists"
+
         # If event is closed
         if [[ $PR_ACTION = "closed" ]] && [[ $PR_MERGED = true ]]; then
           git tag $version
