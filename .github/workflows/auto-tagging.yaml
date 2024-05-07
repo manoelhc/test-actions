@@ -24,13 +24,13 @@ jobs:
     - name: Get changes attributes
       id: versions
       run: |
-       echo "current_version=$(git describe --tags $(git rev-list --tags='v[0-9]+.[0-9]+.[0-9]+' --max-count=1)|cut -dv -f2)" >> "$GITHUB_OUTPUT"
+       echo "current_version=$(git describe --tags $(git rev-list --tags='v[0-9]+.[0-9]+.[0-9]+' --max-count=1 || true)|cut -dv -f2)" >> "$GITHUB_OUTPUT"
        if [[ -z $current_version  ]]; then
          current_version=0.0.0
        fi
-       echo "patch=$(eval[[ "${{ github.event.pull_request.title }}" =~ ${{ env.BUMP_PATCH }} ]] && semver-cli ${current_version} --increment patch)" >> "$GITHUB_OUTPUT"
-       echo "minor=$(eval[[ "${{ github.event.pull_request.title }}" =~ ${{ env.BUMP_MINOR }} ]] && semver-cli ${current_version} --increment minor)" >> "$GITHUB_OUTPUT"
-       echo "major=$(eval[[ "${{ github.event.pull_request.title }}" =~ ${{ env.BUMP_MAJOR }} ]] && semver-cli ${current_version} --increment major)" >> "$GITHUB_OUTPUT"
+       echo "patch=$(eval '[[ \"${{ github.event.pull_request.title }}\" =~ ${{ env.BUMP_PATCH }} ]] && semver-cli ${current_version} --increment patch')" >> "$GITHUB_OUTPUT"
+       echo "minor=$(eval '[[ \"${{ github.event.pull_request.title }}\" =~ ${{ env.BUMP_MINOR }} ]] && semver-cli ${current_version} --increment minor')" >> "$GITHUB_OUTPUT"
+       echo "major=$(eval '[[ \"${{ github.event.pull_request.title }}\" =~ ${{ env.BUMP_MAJOR }} ]] && semver-cli ${current_version} --increment major')" >> "$GITHUB_OUTPUT"
 
     - name: Bump version
       if: steps.versions.outputs.current_version != ''
