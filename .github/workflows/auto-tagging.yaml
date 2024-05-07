@@ -16,7 +16,6 @@ env:
     BUMP_MAJOR: ^((feat|chore|fix)+(\([-A-Z0-9a-z]+\)?)!|BREAKING CHANGE):(.*)+$
 jobs:
   tag:
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v3
@@ -63,8 +62,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: v${{ github.run_number }}
-        release_name: Release v${{ github.run_number }}
+        tag_name: "v${{ steps.versions.outputs.patch }}${{ steps.versions.outputs.minor }}${{ steps.versions.outputs.major }}"
+        release_name: "Release v${{ github.run_number }}"
         body: |
           Release of the main branch at ${{ github.sha }}
         draft: false
