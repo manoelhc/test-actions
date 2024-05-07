@@ -50,7 +50,7 @@ jobs:
         pr_version=pr${PR_NUMBER}
 
         # If event is closed
-        if [[ $PR_CLOSED = true ]] && [[ $PR_MERGED = true ]]; then
+        if [[ $PR_ACTION = "closed" ]] && [[ $PR_MERGED = true ]]; then
           git tag $version
           git push origin $version
           git push --delete origin ${version}-${pr_version}
