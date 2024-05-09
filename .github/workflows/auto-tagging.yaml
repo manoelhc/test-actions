@@ -72,7 +72,7 @@ jobs:
         version=v${VERSION}
         pr_version=pr${PR_NUMBER}
         pr_tag_exists=$(git tag -l | grep -F ${version}-${pr_version} || true)
-        all_pr_tags=$(git tag -l | grep -F \-${pr_version} || true)
+        all_pr_tags=$(git tag -l | egrep ${pr_version}\$ || true)
 
         if [[ -n "${pr_tag_exists}" ]]; then
           echo "The project already has the tag ${pr_tag_exists}"
