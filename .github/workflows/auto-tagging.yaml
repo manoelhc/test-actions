@@ -20,6 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     - name: install Semver
       run: |
         cargo install semver-cli
@@ -38,7 +40,7 @@ jobs:
        echo "major=$(eval '[[ "$PR_TITLE" =~ $BUMP_MAJOR ]] && semver-cli ${current_version} --increment major || true')" >> "$GITHUB_OUTPUT"
 
     - name: Bump version
-      if: steps.versions.outputs.current_version != ''
+      if: steps.versions.outputs.current_version != '' && github.event.pull_request.number != ''
       env:
         VERSION: "${{ steps.versions.outputs.patch }}${{ steps.versions.outputs.minor }}${{ steps.versions.outputs.major }}"
         PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -51,6 +53,7 @@ jobs:
         version=v${VERSION}
         pr_version=pr${PR_NUMBER}
         pr_tag_exists=$(git tag -l | grep -F ${version}-${pr_version} || true)
+        all_pr_tags=$(git tag -l | grep -F \-${pr_version} || true)
 
         if [[ -n "${pr_tag_exists}" ]]; then
           echo "The project already has the tag ${pr_tag_exists}"
@@ -60,13 +63,17 @@ jobs:
         if [[ $PR_ACTION = "closed" ]] && [[ $PR_MERGED = true ]]; then
           git tag $version
           git push origin $version
-          git push --delete origin ${version}-${pr_version}
+          for tag in ${all_pr_tags}; do
+            git push --delete origin $tag
+          done
         elif [[ $PR_ACTION = "closed" ]] && [[ $PR_MERGED = false ]] && [[ -n "${pr_tag_exists}" ]]; then
           git push --delete origin ${version}-${pr_version}
         else
           if [[ -n "${pr_tag_exists}" ]]; then
             git tag -d ${version}-${pr_version}
-            git push --delete origin ${version}-${pr_version}
+            for tag in ${all_pr_tags}; do
+              git push --delete origin $tag
+            done
           fi
           git tag ${version}-${pr_version} $(git rev-parse --short "$GITHUB_SHA")
           git push origin ${version}-${pr_version}
