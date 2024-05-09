@@ -129,4 +129,4 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         generate_release_notes: true
-        tag_name: "v${{ steps.apply_version.outputs.new_version }}"
+        tag_name: "${{ steps.apply_version.outputs.new_version }}"
