@@ -45,9 +45,9 @@ jobs:
        echo "minor=${minor}" >> "$GITHUB_OUTPUT"
        echo "major=${major}" >> "$GITHUB_OUTPUT"
 
-       if [[ -n ${patch} ]] && next_version=${patch}
-       if [[ -n ${minor} ]] && next_version=${minor}
-       if [[ -n ${major} ]] && next_version=${major}
+       [[ -n ${patch} ]] && next_version=${patch}
+       [[ -n ${minor} ]] && next_version=${minor}
+       [[ -n ${major} ]] && next_version=${major}
 
        echo "next_version=${next_version}" >> "$GITHUB_OUTPUT"
 
