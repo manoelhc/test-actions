@@ -36,15 +36,28 @@ jobs:
        echo "current_version=$current_version" >> "$GITHUB_OUTPUT"
 
        PR_TITLE="${{ github.event.pull_request.title }}"
-       echo "patch=$(eval '[[ "$PR_TITLE" =~ $BUMP_PATCH ]] && semver-cli ${current_version} --increment patch || true')" >> "$GITHUB_OUTPUT"
-       echo "minor=$(eval '[[ "$PR_TITLE" =~ $BUMP_MINOR ]] && semver-cli ${current_version} --increment minor || true')" >> "$GITHUB_OUTPUT"
-       echo "major=$(eval '[[ "$PR_TITLE" =~ $BUMP_MAJOR ]] && semver-cli ${current_version} --increment major || true')" >> "$GITHUB_OUTPUT"
+
+       patch=$(eval '[[ "$PR_TITLE" =~ $BUMP_PATCH ]] && semver-cli ${current_version} --increment patch || true')
+       minor=$(eval '[[ "$PR_TITLE" =~ $BUMP_MINOR ]] && semver-cli ${current_version} --increment minor || true')
+       major=$(eval '[[ "$PR_TITLE" =~ $BUMP_MAJOR ]] && semver-cli ${current_version} --increment major || true')
+
+       echo "patch=${patch}" >> "$GITHUB_OUTPUT"
+       echo "minor=${minor}" >> "$GITHUB_OUTPUT"
+       echo "major=${major}" >> "$GITHUB_OUTPUT"
+
+       echo "next_version=${patch}.${minor}.${major}" >> "$GITHUB_OUTPUT"
+
+    - uses: mshick/add-pr-comment@v2
+      if: steps.versions.outputs.next_version == 0
+      with:
+         message: |
+           No tag was generated due to PR title not compatible with Conventional Commits.
 
     - name: Tag new version
       id: apply_version
-      if: steps.versions.outputs.current_version != ''
+      if: steps.versions.outputs.current_version != 0 || steps.versions.outputs.next_version == 0
       env:
-        VERSION: "${{ steps.versions.outputs.patch }}${{ steps.versions.outputs.minor }}${{ steps.versions.outputs.major }}"
+        VERSION: "${{ steps.versions.outputs.next_version }}"
         PR_NUMBER: ${{ github.event.pull_request.number }}
         PR_MERGED: ${{ github.event.pull_request.merged }}
         PR_ACTION: ${{ github.event.action }}
