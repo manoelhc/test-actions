@@ -10,6 +10,7 @@ on:
       - hotfix/*
       - ci/*
       - chore/*
+      - release/*
 env:
     BUMP_PATCH: ^(fix|hotfix|ci)+(\([-A-Z0-9a-z]+\))?:(.*)+$
     BUMP_MINOR: ^(feat|chore)+(\([-A-Z0-9a-z]+\))?:(.*)+$
