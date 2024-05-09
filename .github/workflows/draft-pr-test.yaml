@@ -24,7 +24,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: coverage-ref.lcov
-          path: ./coverage.lcov
+          path: coverage.lcov
 
   checks:
     runs-on: ubuntu-latest
@@ -52,8 +52,8 @@ jobs:
       uses: barecheck/code-coverage-action@v1
       with:
         barecheck-github-app-token: ${{ secrets.BARECHECK_GITHUB_APP_TOKEN }}
-        lcov-file: "./coverage.lcov"
-        base-lcov-file: "./coverage-ref.lcov"
+        lcov-file: "coverage.lcov"
+        base-lcov-file: "coverage-ref.lcov"
         minimum-ratio: 50
         send-summary-comment: true
         show-annotations: "warning" # Possible options warning|error
