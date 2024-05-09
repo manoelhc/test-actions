@@ -34,7 +34,7 @@ jobs:
     - name: Download code coverage report from base branch
       uses: actions/download-artifact@v3
       with:
-        name: ./coverage-ref.lcov
+        name: coverage-ref.lcov
 
     - name: Install Python 3.12
       uses: actions/setup-python@v5
