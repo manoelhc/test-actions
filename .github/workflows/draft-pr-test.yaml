@@ -29,6 +29,7 @@ jobs:
 
   checks:
     runs-on: ubuntu-latest
+    permissions: write-all
     needs: base_branch_cov
     steps:
     - uses: actions/checkout@v3
