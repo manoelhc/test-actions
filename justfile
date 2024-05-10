@@ -89,7 +89,7 @@ test-ci:
         export PYTHONPATH=$pwd/src && \
         export ENVIRONMENT=development && \
         export HOST=0.0.0.0 && \
-        pytest --cov=src --cov-report=xml --cov-config=tox.ini --cov-branch src --full-trace
+        pytest --cov=src --cov-report=xml --cov-report=lcov --cov-config=tox.ini --cov-branch src --full-trace
 
 # Use this command to check your code before committing (pre-commit hooks)
 check:
