@@ -20,11 +20,12 @@ jobs:
       - name: Run tests
         run: |
           just test-ci
+          mv coverage.lcov coverage-ref.lcov
       - name: Upload code coverage for ref branch
         uses: actions/upload-artifact@v3
         with:
           name: coverage-ref.lcov
-          path: coverage.lcov
+          path: coverage-ref.lcov
 
   checks:
     runs-on: ubuntu-latest
