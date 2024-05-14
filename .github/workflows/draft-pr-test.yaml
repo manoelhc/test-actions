@@ -8,7 +8,7 @@ jobs:
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.base_ref }}
       - name: Install Python 3.12
@@ -32,7 +32,7 @@ jobs:
     permissions: write-all
     needs: base_branch_cov
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Download code coverage report from base branch
       uses: actions/download-artifact@v3
