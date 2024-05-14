@@ -22,7 +22,7 @@ jobs:
           just test-ci
           mv coverage.lcov coverage-ref.lcov
       - name: Upload code coverage for ref branch
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-ref.lcov
           path: coverage-ref.lcov
