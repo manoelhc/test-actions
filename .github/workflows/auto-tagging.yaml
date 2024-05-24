@@ -175,7 +175,7 @@ jobs:
       with:
         context: .
         push: true
-        tags: ${{ steps.meta.outputs.tags }}:${{ needs.tag.outputs.image_version }}
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.tag.outputs.image_version }}
         labels: ${{ steps.meta.outputs.labels }}
 
     # Remove the PR tag if the PR is closed
@@ -184,7 +184,7 @@ jobs:
       env:
         PR_NUMBER: ${{ github.event.pull_request.number }}
         VERSION: "${{ steps.versions.outputs.next_version }}"
-        TAG: ${{ steps.meta.outputs.tags }}
+        TAG: ${{ needs.tag.outputs.image_version }}
       run: |
         docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${TAG}-${PR_NUMBER}
         docker rmi ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${TAG}-${PR_NUMBER}
