@@ -53,20 +53,19 @@ jobs:
 
        if [[ -z $next_version ]]; then
          echo "No version was generated due to PR title not compatible with Conventional Commits."
+         echo "PR Title: $PR_TITLE"
          exit 1
        fi
 
        echo "next_version=${next_version}" >> "$GITHUB_OUTPUT"
 
     - uses: mshick/add-pr-comment@v2
-      if: steps.versions.outputs.next_version == 0
       with:
          message: |
            No tag was generated due to PR title not compatible with Conventional Commits.
 
     - name: Tag new version
       id: apply_version
-      if: steps.versions.outputs.current_version != 0 || steps.versions.outputs.next_version == 0 || steps.versions.outputs.next_version != null
       env:
         VERSION: "${{ steps.versions.outputs.next_version }}"
         PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -120,13 +119,13 @@ jobs:
         echo "new_hash=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
 
     - uses: mshick/add-pr-comment@v2
-      if: startsWith(steps.apply_version.outputs.new_version, 'v') && steps.apply_version.outputs.new_version != 'v'
+      if: startsWith(steps.apply_version.outputs.new_version, 'v')
       with:
         message: |
           Tag `${{ steps.apply_version.outputs.old_version }}` removed.
 
     - uses: mshick/add-pr-comment@v2
-      if: startsWith(steps.apply_version.outputs.new_version, 'v') && steps.apply_version.outputs.new_version != 'v'
+      if: startsWith(steps.apply_version.outputs.new_version, 'v')
       with:
         message: |
           Tag `${{ steps.apply_version.outputs.new_version }}` (branch: `${{ steps.apply_version.outputs.new_branch }}`, SHA: `${{ steps.apply_version.outputs.new_hash }}`) Added.
