@@ -31,7 +31,7 @@ jobs:
       env:
         PR_TITLE: "${{ github.event.pull_request.title }}"
       run: |
-       current_version=$(git describe --tags $(git rev-list --tags='v[0-9]+.[0-9]+.[0-9]+' --max-count=1 || true)|cut -dv -f2)
+       current_version=$(git tag | cut -dv -f2 | sort -V | egrep '^[0-9]+.[0-9]+.[0-9]+$' | tail -n1)
        if [[ -z $current_version  ]]; then
          current_version=0.0.0
        fi
