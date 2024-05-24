@@ -147,8 +147,14 @@ jobs:
         VERSION: "${{ steps.versions.outputs.next_version }}"
       run: |
         git fetch --tags origin
-        git tag -d ${VERSION}-${PR_NUMBER}
-        git push --delete origin ${VERSION}-${PR_NUMBER}
+        # Check if the tag is already deleted
+        tag_exists=$(git tag -l | grep -F ${VERSION}-${PR_NUMBER} || true)
+        if [[ -z "${tag_exists}" ]]; then
+          echo "The tag ${VERSION}-${PR_NUMBER} has already been deleted."
+        else
+          git tag -d ${VERSION}-${PR_NUMBER}
+          git push --delete origin ${VERSION}-${PR_NUMBER}
+        fi
 
   push-image:
     permissions: write-all
@@ -173,13 +179,13 @@ jobs:
         labels: ${{ steps.meta.outputs.labels }}
 
     # Remove the PR tag if the PR is closed
-    - name: Remove PR tag
+    - name: Remove Image tag with PR from registry
       if: github.event.pull_request.merged == true && github.event.pull_request.number != null
       env:
         PR_NUMBER: ${{ github.event.pull_request.number }}
         VERSION: "${{ steps.versions.outputs.next_version }}"
         TAG: ${{ steps.meta.outputs.tags }}
       run: |
-        git fetch --tags origin
-        git tag -d ${TAG}:${VERSION}-${PR_NUMBER}
-        git push --delete origin ${TAG}:${VERSION}-${PR_NUMBER}
+        docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${TAG}-${PR_NUMBER}
+        docker rmi ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${TAG}-${PR_NUMBER}
+        docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${TAG}-${PR_NUMBER}
