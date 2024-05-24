@@ -20,6 +20,7 @@ Dockerfile
 .mypy_cache
 .pytest_cache
 .coverage
+*.lcov
 
 # Mac files
 .DS_Store
