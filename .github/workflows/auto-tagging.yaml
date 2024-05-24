@@ -12,13 +12,17 @@ on:
       - chore/*
       - release/*
 env:
-    BUMP_PATCH: ^(fix|hotfix|ci)+(\([-A-Z0-9a-z]+\))?:(.*)+$
+    BUMP_PATCH: ^(fix|hotfix|ci)+(\([-A-Z0-9a-z]+\))?:(.*)+$|^chore\(deps\):(.*)+$|^chore\(bump\):(.*)+$
     BUMP_MINOR: ^(feat|chore)+(\([-A-Z0-9a-z]+\))?:(.*)+$
     BUMP_MAJOR: ^((feat|chore|fix)+(\([-A-Z0-9a-z]+\)?)!|BREAKING CHANGE):(.*)+$
+    REGISTRY: ghcr.io
+    IMAGE_NAME: ${{ github.repository }}
 jobs:
   tag:
     permissions: write-all
     runs-on: ubuntu-latest
+    outputs:
+      image_version: ${{ steps.apply_version.outputs.new_version }}
     steps:
     - uses: actions/checkout@v4
       with:
@@ -45,7 +49,12 @@ jobs:
        echo "minor=${minor}" >> "$GITHUB_OUTPUT"
        echo "major=${major}" >> "$GITHUB_OUTPUT"
 
-       next_version=${major:-${minor:-${patch}}}
+       next_version=${patch:-${minor:-${major}}}
+
+       if [[ -z $next_version ]]; then
+         echo "No version was generated due to PR title not compatible with Conventional Commits."
+         exit 1
+       fi
 
        echo "next_version=${next_version}" >> "$GITHUB_OUTPUT"
 
@@ -57,7 +66,7 @@ jobs:
 
     - name: Tag new version
       id: apply_version
-      if: steps.versions.outputs.current_version != 0 || steps.versions.outputs.next_version == 0
+      if: steps.versions.outputs.current_version != 0 || steps.versions.outputs.next_version == 0 || steps.versions.outputs.next_version != null
       env:
         VERSION: "${{ steps.versions.outputs.next_version }}"
         PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -111,13 +120,13 @@ jobs:
         echo "new_hash=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
 
     - uses: mshick/add-pr-comment@v2
-      if: startsWith(steps.apply_version.outputs.old_version, 'v')
+      if: startsWith(steps.apply_version.outputs.new_version, 'v') && steps.apply_version.outputs.new_version != 'v'
       with:
         message: |
           Tag `${{ steps.apply_version.outputs.old_version }}` removed.
 
     - uses: mshick/add-pr-comment@v2
-      if: startsWith(steps.apply_version.outputs.new_version, 'v')
+      if: startsWith(steps.apply_version.outputs.new_version, 'v') && steps.apply_version.outputs.new_version != 'v'
       with:
         message: |
           Tag `${{ steps.apply_version.outputs.new_version }}` (branch: `${{ steps.apply_version.outputs.new_branch }}`, SHA: `${{ steps.apply_version.outputs.new_hash }}`) Added.
@@ -130,3 +139,48 @@ jobs:
       with:
         generate_release_notes: true
         tag_name: "${{ steps.apply_version.outputs.new_version }}"
+
+    # Remove the PR tag if the PR is closed
+    - name: Remove PR tag
+      if: github.event.pull_request.merged == true && github.event.pull_request.number != null
+      env:
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        VERSION: "${{ steps.versions.outputs.next_version }}"
+      run: |
+        git fetch --tags origin
+        git tag -d ${VERSION}-${PR_NUMBER}
+        git push --delete origin ${VERSION}-${PR_NUMBER}
+
+  push-image:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    needs: tag
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@v5.5.1
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+    - name: Build and push Docker image
+      id: push
+      uses: docker/build-push-action@v5.3.0
+      with:
+        context: .
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}:${{ needs.tag.outputs.image_version }}
+        labels: ${{ steps.meta.outputs.labels }}
+
+    # Remove the PR tag if the PR is closed
+    - name: Remove PR tag
+      if: github.event.pull_request.merged == true && github.event.pull_request.number != null
+      env:
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        VERSION: "${{ steps.versions.outputs.next_version }}"
+        TAG: ${{ steps.meta.outputs.tags }}
+      run: |
+        git fetch --tags origin
+        git tag -d ${TAG}:${VERSION}-${PR_NUMBER}
+        git push --delete origin ${TAG}:${VERSION}-${PR_NUMBER}
