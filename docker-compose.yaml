@@ -1,0 +1,17 @@
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    # Load env from .env.local file
+    env_file:
+      - .env.local
+  nginx:
+    image: nginx:1.21
+    ports:
+      - "443:8443"
+    volumes:
+      - ./confs/docker-compose/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./confs/docker-compose/nginx/certs:/etc/nginx/certs
+    depends_on:
+      - web

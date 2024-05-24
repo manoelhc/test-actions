@@ -20,6 +20,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           format: openapi
-          target: 'http://localhost:5000/openapi.json'
+          target: 'https://localhost:8443/openapi.json'
           # The '-a' option activates all active scanners. Use this for comprehensive scanning.
           cmd_options: '-a'
