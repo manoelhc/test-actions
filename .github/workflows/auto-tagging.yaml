@@ -12,7 +12,7 @@ on:
       - chore/*
       - release/*
 env:
-    BUMP_PATCH: ^(fix|hotfix|ci)+(\([-A-Z0-9a-z]+\))?:(.*)+$|^chore\(deps\):(.*)+$|^chore\(bump\):(.*)+$
+    BUMP_PATCH: ^(fix|hotfix|ci)+(\([-A-Z0-9a-z]+\))?:(.*)+$|^chore\(deps\):(.*)+$|^chore\(bump\):(.*)+$|^\[Snyk\](.*)+$
     BUMP_MINOR: ^(feat|chore)+(\([-A-Z0-9a-z]+\))?:(.*)+$
     BUMP_MAJOR: ^((feat|chore|fix)+(\([-A-Z0-9a-z]+\)?)!|BREAKING CHANGE):(.*)+$
     REGISTRY: ghcr.io
