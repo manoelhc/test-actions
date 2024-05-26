@@ -102,7 +102,8 @@ install-k8s:
     minikube start -p test-actions
     minikube addons enable ingress -p test-actions
     minikube addons enable ingress-dns -p test-actions
-    sleep 10
+    kubectl wait --for=condition=ready -n ingress-nginx pod -l app.kubernetes.io/component=controller
+    kubectl wait --for=condition=ready -n kube-system pod -l app=minikube-ingress-dns
     helm install -n test-actions --create-namespace local-api charts/local-api
 
 # Destroy k8s

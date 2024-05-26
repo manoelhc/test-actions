@@ -208,7 +208,7 @@ jobs:
       run: |
         docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.tag.outputs.image_version }}
         docker run -d --name test-actions --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.tag.outputs.image_version }}
-        docker exec test-actions /app/docker_healthcheck.py
+        docker exec test-actions python docker_healthcheck.py
   test-image-kubernetes:
     needs:
       - tag
