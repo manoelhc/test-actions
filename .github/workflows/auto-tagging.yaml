@@ -195,31 +195,39 @@ jobs:
         docker rmi ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${TAG}-${PR_NUMBER}
         docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${TAG}-${PR_NUMBER}
   test-image-docker:
-    needs: push-image
+    needs:
+      - tag
+      - push-image
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: Pull Docker image
-      run: docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.tag.outputs.image_version }}
     - name: Test Docker image
-      run: docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.tag.outputs.image_version }} echo "Test passed"
+      run: |
+        docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.tag.outputs.image_version }}
+        docker run -d --name test-actions --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.tag.outputs.image_version }}
+        docker exec test-actions /app/docker_healthcheck.py
   test-image-kubernetes:
-    needs: push-image
+    needs:
+      - tag
+      - push-image
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: start minikube
+    - name: Install minikube
       id: minikube
       uses: medyagh/setup-minikube@master
+      with:
+        start: false
     - uses: azure/setup-helm@v4.2.0
       with:
         version: v3.15.1
+    - uses: extractions/setup-just@v2
     - name:  Deploy to minikube and the helm chart
       run: |
         just install-k8s
