@@ -183,7 +183,6 @@ jobs:
         push: true
         tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.tag.outputs.image_version }}
         labels: ${{ steps.meta.outputs.labels }}
-
     # Remove the PR tag if the PR is closed
     - name: Remove Image tag with PR from registry
       if: github.event.pull_request.merged == true && github.event.pull_request.number != null
@@ -195,3 +194,32 @@ jobs:
         docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${TAG}-${PR_NUMBER}
         docker rmi ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${TAG}-${PR_NUMBER}
         docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${TAG}-${PR_NUMBER}
+  test-image-docker:
+    needs: push-image
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Pull Docker image
+      run: docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.tag.outputs.image_version }}
+    - name: Test Docker image
+      run: docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.tag.outputs.image_version }} echo "Test passed"
+  test-image-kubernetes:
+    needs: push-image
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: start minikube
+      id: minikube
+      uses: medyagh/setup-minikube@master
+    - uses: azure/setup-helm@v4.2.0
+      with:
+        version: v3.15.1
+    - name:  Deploy to minikube and the helm chart
+      run: |
+        just install-k8s

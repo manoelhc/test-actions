@@ -96,3 +96,15 @@ build-packages:
     cd packages/manocorp && \
         python setup.py build && \
         pip install .
+
+# Install k8s via minikube and install local-api helm chart
+install-k8s:
+    minikube start -p test-actions
+    minikube addons enable ingress -p test-actions
+    minikube addons enable ingress-dns -p test-actions
+    sleep 10
+    helm install -n test-actions --create-namespace local-api charts/local-api
+
+# Destroy k8s
+destroy-k8s:
+    minikube delete -p test-actions
