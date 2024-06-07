@@ -19,8 +19,9 @@ jobs:
           # Wait for the web application to start. Retry 5 times every 5 seconds.
           for i in {1..5}; do
             sleep 5
-            curl -s -o /dev/null -w "%{http_code}" http://localhost:8443/ || exit 1
+            curl -s -o /dev/null -w "%{http_code}" http://localhost:8443/ && exit 0
           done
+          exit 1
 
       - name: ZAP Scan
         uses: zaproxy/action-api-scan@v0.7.0
