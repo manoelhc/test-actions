@@ -16,15 +16,7 @@ jobs:
       - name: Run image
         run: |
           just run-ci
-          # Wait for the web application to start. Retry 5 times every 5 seconds.
-          for i in {1..5}; do
-            sleep 5
-            response_code=$(curl -k -s -o /dev/null -w "%{http_code}" https://127.0.0.1/health || true)
-            if [ $response_code -eq 200 ]; then
-              exit 0
-            fi
-          done
-          exit 1
+          curl --retry 5 --retry-max-time 120 -k -s -o /dev/null -w "%{http_code}" https://127.0.0.1/health
 
       - name: ZAP Scan
         uses: zaproxy/action-api-scan@v0.7.0
