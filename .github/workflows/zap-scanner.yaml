@@ -19,7 +19,7 @@ jobs:
           # Wait for the web application to start. Retry 5 times every 5 seconds.
           for i in {1..5}; do
             sleep 5
-            response_code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8443 || true)
+            response_code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8443/health || true)
             if [ $response_code -eq 200 ]; then
               exit 0
             fi
