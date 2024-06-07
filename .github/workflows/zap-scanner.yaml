@@ -7,7 +7,7 @@ permissions:
   issues: write
 jobs:
   zap_scan:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     name: Scan the webapplication
     steps:
       - uses: actions/checkout@v4
@@ -15,8 +15,6 @@ jobs:
       # This step builds the image and runs the web application in the background for the ZAP scan
       - name: Run image
         run: |
-          sudo apt update
-          sudo apt install -y docker-compose-v2
           docker-compose --version
           just run-ci
       - name: ZAP Scan
