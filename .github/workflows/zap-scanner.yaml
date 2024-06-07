@@ -16,7 +16,7 @@ jobs:
       - name: Run image
         run: |
           sudo apt update
-          sudo apt install -y docker.io docker-compose
+          sudo apt install -y docker-compose
           docker-compose --version
           just run-ci
       - name: ZAP Scan
