@@ -51,8 +51,8 @@ run: build
     docker run -it -p 5000:5000 -e ENVIRONMENT=development -v $pwd/data:/data test-actions
 
 # Use this command to run the application in CI/CD pipeline
-run-ci: build
-    docker-compose up -d --wait
+run-ci:
+    docker-compose up -d
 
 # Use this command to run the application in development mode in your local machine,
 # using your local source code, without the need to rebuild the image. Don't use it if you're
