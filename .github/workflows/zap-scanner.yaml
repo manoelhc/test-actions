@@ -2,7 +2,7 @@ name: ZAP Scan
 on:
   push:
     branches:
-      - main
+      - feat/fix-zap-tests
 permissions:
   issues: write
 jobs:
