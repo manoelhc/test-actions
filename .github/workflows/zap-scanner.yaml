@@ -14,7 +14,11 @@ jobs:
       - uses: extractions/setup-just@v2
       # This step builds the image and runs the web application in the background for the ZAP scan
       - name: Run image
-        run: just run-ci
+        run: |
+          apt update
+          apt install -y docker.io docker-compose
+          docker-compose --version
+          just run-ci
       - name: ZAP Scan
         uses: zaproxy/action-api-scan@v0.7.0
         with:
