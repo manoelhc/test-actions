@@ -7,7 +7,7 @@ permissions:
   issues: write
 jobs:
   zap_scan:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     name: Scan the webapplication
     steps:
       - uses: actions/checkout@v4
@@ -15,10 +15,13 @@ jobs:
       # This step builds the image and runs the web application in the background for the ZAP scan
       - name: Run image
         run: |
-          sudo apt update
-          sudo apt install -y docker-compose-v2
-          docker-compose --version
           just run-ci
+          # Wait for the web application to start. Retry 5 times every 5 seconds.
+          for i in {1..5}; do
+            sleep 5
+            curl -s -o /dev/null -w "%{http_code}" http://localhost:8443/ || exit 1
+          done
+
       - name: ZAP Scan
         uses: zaproxy/action-api-scan@v0.7.0
         with:
