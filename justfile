@@ -52,7 +52,7 @@ run: build
 
 # Use this command to run the application in CI/CD pipeline
 run-ci:
-    docker-compose up -d --wait
+    docker-compose up -d
 
 # Use this command to run the application in development mode in your local machine,
 # using your local source code, without the need to rebuild the image. Don't use it if you're
