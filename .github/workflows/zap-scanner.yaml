@@ -16,7 +16,7 @@ jobs:
       - name: Run image
         run: |
           just run-ci
-          curl --retry 5 --retry-max-time 120 -k -s -o /dev/null -w "%{http_code}" https://127.0.0.1/health
+          curl --retry 5 --retry-connrefused --retry-max-time 120 -k -s https://127.0.0.1/health
 
       - name: ZAP Scan
         uses: zaproxy/action-api-scan@v0.7.0
