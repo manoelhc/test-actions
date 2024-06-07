@@ -15,8 +15,8 @@ jobs:
       # This step builds the image and runs the web application in the background for the ZAP scan
       - name: Run image
         run: |
-          apt update
-          apt install -y docker.io docker-compose
+          sudo apt update
+          sudo apt install -y docker.io docker-compose
           docker-compose --version
           just run-ci
       - name: ZAP Scan
