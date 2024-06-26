@@ -23,8 +23,8 @@ class Auth(SQLModel, table=True):
     updated_at: datetime | None = Field(default=datetime.now(), nullable=True)
     deleted_at: datetime | None = Field(default=None, nullable=True)
 
-    @classmethod
     @field_validator("password")
+    @classmethod
     def password_check(cls, password: str):
         # Check if password is strong
         if len(password) < 8:
