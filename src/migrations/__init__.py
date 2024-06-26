@@ -1,5 +1,7 @@
-from sqlmodel import Session, SQLModel, create_engine
+from sqlmodel import Session, SQLModel, create_engine, select
 from models.user import User
+from models.auth import Auth
+import uuid
 
 import config
 
@@ -36,7 +38,27 @@ def seed_db():
     This function creates a new session, adds a demo user to the session,
     and commits the changes to the database.
     """
+    print("Seeding DB")
+    default_username = "manoel"
+    # ruff: noqa: B105
+    default_password = f"{uuid.uuid4()}!8"
+
     session = Session(engine)
-    user = User(username="demo", is_active=True)
+    user = User(username=default_username, is_active=True)
     session.add(user)
+    session.commit()
+
+    user = session.exec(
+        select(User).where(
+            User.username == default_username,
+            # ruff: noqa: E712
+            User.is_active == True,
+            # ruff: noqa: E711
+            User.deleted_at == None,
+        ),
+    ).first()
+
+    session = Session(engine)
+    auth = Auth(username_id=user.id, password=default_password)
+    session.add(auth)
     session.commit()

@@ -15,6 +15,8 @@ class UserCreate(SQLModel):
 
     username: str
 
+    # TODO: https://github.com/shouldbee/reserved-usernames/blob/master/reserved-usernames.txt
+
     @field_validator("username")
     @classmethod
     # skipcq: FLK-W505

@@ -18,6 +18,7 @@ def client():
     client = TestClient(app)
     yield client
     delete_db_and_tables()
+    # os.unlink('data/test_db')
     client.close()
 
 
