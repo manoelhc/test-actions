@@ -7,19 +7,22 @@ permissions:
   issues: write
 jobs:
   zap_scan:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     name: Scan the webapplication
     steps:
       - uses: actions/checkout@v4
       - uses: extractions/setup-just@v2
       # This step builds the image and runs the web application in the background for the ZAP scan
       - name: Run image
-        run: just run-ci
+        run: |
+          just run-ci
+          curl --retry 10 --retry-connrefused --retry-max-time 120 -k -s https://127.0.0.1/health
+
       - name: ZAP Scan
         uses: zaproxy/action-api-scan@v0.7.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           format: openapi
-          target: 'https://localhost:8443/openapi.json'
+          target: 'https://127.0.0.1/openapi.json'
           # The '-a' option activates all active scanners. Use this for comprehensive scanning.
           cmd_options: '-a'
