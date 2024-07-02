@@ -2,7 +2,7 @@ alembic==1.13.2
 fastapi==0.111.0
 opentelemetry-distro==0.45b0
 opentelemetry-instrumentation==0.45b0
-pydantic==2.7.4
+pydantic==2.8.0
 PyJWT==2.8.0
 pytest==8.2.2
 python-decouple==3.8
