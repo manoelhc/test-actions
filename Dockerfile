@@ -1,5 +1,5 @@
 # Builder
-FROM python@sha256:fce9bc7648ef917a5ab67176cf1c7eb41b110452e259736144bc22f32f3aa622 AS builder
+FROM python@sha256:b6f142bd70d2219c98c143094ad2a0b8cc882294a7fb2664377a7b68edfc5767 AS builder
 LABEL org.opencontainers.image.source="https://github.com/docker-library/python"
 LABEL org.opencontainers.image.description="Python 3.12.0"
 WORKDIR /app
@@ -20,7 +20,7 @@ RUN pip install --cache-dir=/tmp /manocorp --force-reinstall --target=/packages
 RUN python -m compileall .
 
 # Final
-FROM python@sha256:fce9bc7648ef917a5ab67176cf1c7eb41b110452e259736144bc22f32f3aa622
+FROM python@sha256:b6f142bd70d2219c98c143094ad2a0b8cc882294a7fb2664377a7b68edfc5767
 WORKDIR /app
 COPY --from=builder --chown=root:root /packages /packages
 COPY --from=builder --chown=root:root /app /app
