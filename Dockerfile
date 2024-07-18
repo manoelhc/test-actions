@@ -6,7 +6,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential=12.9 \
     rustc=1.63.0+dfsg1-2 \
-    libpq-dev=15.6-0+deb12u1 \
+    libpq-dev=15.7-0+deb12u1 \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
