@@ -13,5 +13,6 @@ PROTOCOL = os.getenv("PROTOCOL", "http")
 CORS_ALLOW_ORIGINS = os.getenv("CORS_ALLOW_ORIGINS", "*").split(",")
 CORS_ALLOW_METHODS = os.getenv("CORS_ALLOW_METHODS", "GET,POST,PUT,DELETE").split(",")
 CORS_ALLOW_HEADERS = os.getenv("CORS_ALLOW_HEADERS", "*").split(",")
+PASSWORD_SALT = os.getenv("PASSWORD_SALT", "secret")
 
 IS_DEVELOPMENT = ENVIRONMENT == "development"

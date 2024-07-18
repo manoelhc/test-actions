@@ -1,5 +1,6 @@
 alembic==1.13.1
 blake3==0.4.1
+email-validator==2.2.0
 fastapi==0.111.0
 opentelemetry-distro==0.45b0
 opentelemetry-instrumentation==0.45b0

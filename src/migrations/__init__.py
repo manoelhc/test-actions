@@ -39,18 +39,23 @@ def seed_db():
     and commits the changes to the database.
     """
     print("Seeding DB")
-    default_username = "manoel"
+    default_username = "admin"
     # ruff: noqa: B105
     default_password = f"{uuid.uuid4()}!8"
 
     session = Session(engine)
-    user = User(username=default_username, is_active=True)
+    user = User(
+        username=default_username,
+        email=f"{default_username}@example.com",
+        is_active=True,
+    )
     session.add(user)
     session.commit()
 
     user = session.exec(
         select(User).where(
             User.username == default_username,
+            User.email == f"{default_username}@example.com",
             # ruff: noqa: E712
             User.is_active == True,
             # ruff: noqa: E711

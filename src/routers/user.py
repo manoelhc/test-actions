@@ -2,7 +2,10 @@ from fastapi import APIRouter, HTTPException
 from manocorp.fastapi.routing import SecFetchJsonRoute
 from sqlalchemy.exc import IntegrityError
 from models.user import User, UserSimple, UserCreate, UserUpdate
+from models.auth import Auth
 from sqlmodel import Session, create_engine, select
+from helpers import auth
+
 import config
 from datetime import datetime
 
@@ -25,7 +28,7 @@ ERROR_BAD_REQUEST = HTTPException(status_code=400, detail="Bad request")
 
 
 @router.post("/user", response_model=UserSimple)
-def create_user(user: UserCreate):
+def create_user(new_user: UserCreate):
     """Creates a new user.
 
     Args:
@@ -40,12 +43,34 @@ def create_user(user: UserCreate):
     """
     with Session(engine) as session:
         try:
-            user = User(username=user.username)
-            user.model_validate(user)
+            new_user = UserCreate.model_validate(new_user)
+            user = User(
+                email=new_user.email,
+                username=new_user.username,
+            )
+
             session.add(user)
             session.commit()
-            # session.refresh(user)
+
+            user_db = session.exec(
+                select(User).where(
+                    # ruff: noqa: E712
+                    User.username == user.username,
+                    # ruff: noqa: E712
+                ),
+            ).first()
+
+            user_auth = Auth(
+                username_id=user_db.id,
+                reset_token=auth.get_password_token(),
+                password=auth.get_password_token(),
+            )
+
+            session.add(user_auth)
+            session.commit()
+
             return UserSimple.model_validate(user)
+
         except ValueError:
             raise ERROR_USER_INVALID_USERNAME
         except IntegrityError:

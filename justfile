@@ -48,7 +48,7 @@ build:
 
 # Use this command to build and run the application in development mode in your local machine
 run: build
-    docker run -it -p 5000:5000 -e HOST=0.0.0.0 -e ENVIRONMENT=development -v $pwd/data:/data test-actions
+    docker run -it -p 5000:5000 -e HOST=0.0.0.0 -e 'DATABASE_URL=sqlite:////app/data/test_db' -e ENVIRONMENT=development -v $pwd/data:/app/data test-actions
 
 # Use this command to run the application in CI/CD pipeline
 run-ci:
@@ -58,7 +58,7 @@ run-ci:
 # using your local source code, without the need to rebuild the image. Don't use it if you're
 # adding new dependencies to the project.
 run-local:
-    docker run -it -p 5000:5000 -e ENVIRONMENT=development -e 'DATABASE_URL=sqlite:////data/test_db' -v $pwd/data:/data -v $pwd/src:/app test-actions
+    docker run -it -p 5000:5000 -e ENVIRONMENT=development -e 'DATABASE_URL=sqlite:///data/test_db' -v $pwd/data:/data -v $pwd/src:/app test-actions
 
 # Use this command to run pytest
 test: install-deps

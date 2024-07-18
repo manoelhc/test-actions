@@ -1,8 +1,8 @@
 from datetime import datetime
 import uuid
-import re
 from sqlmodel import Field, SQLModel
 from pydantic import field_validator
+from helpers.user import validate_user, validate_email
 
 
 class UserCreate(SQLModel):
@@ -11,11 +11,11 @@ class UserCreate(SQLModel):
 
     Attributes:
         username (str): The username of the user to be created.
+        email (str): The email of the user to be created.
     """
 
     username: str
-
-    # TODO: https://github.com/shouldbee/reserved-usernames/blob/master/reserved-usernames.txt
+    email: str
 
     @field_validator("username")
     @classmethod
@@ -39,11 +39,14 @@ class UserCreate(SQLModel):
                 contains non-alphanumeric characters.
         """
         username = username.strip().lower()
-        if len(username) <= 2:
-            raise ValueError("Username should be more than 2 characters")
-        if re.match(r"^\w*$", username) is None:
-            raise ValueError("Username must be alphanumeric and underscore only")
-        return username
+        if validate_user(username):
+            return str(username)
+        return None
+
+    @field_validator("email")
+    @classmethod
+    def email_validator(cls, email: str) -> bool:
+        return validate_email(email)
 
 
 class User(UserCreate, table=True):
@@ -69,7 +72,9 @@ class User(UserCreate, table=True):
         unique=True,
         index=True,
     )
-    username: str = Field(default=None, index=True, unique=True, max_length=50)
+
+    username: str = Field(default=None, index=True, unique=True, max_length=255)
+    email: str = Field(default=None, index=False, unique=True, max_length=255)
     is_active: bool = Field(default=True)
     created_at: datetime = Field(default=datetime.now())
     updated_at: datetime | None = Field(default=datetime.now(), nullable=True)
