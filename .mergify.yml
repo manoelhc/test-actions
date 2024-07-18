@@ -8,3 +8,9 @@ pull_request_rules:
     actions:
       merge:
         method: squash
+queue_rules:
+ # This rule processes merge requests one at a time to ensure a linear history and better usage of GHA.
+  - name: default
+    batch_size: 1
+    batch_max_wait_time: 10 min
+    merge_method: squash
