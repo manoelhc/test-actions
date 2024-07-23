@@ -11,4 +11,4 @@ redis==5.0.7
 requests==2.32.3
 SQLAlchemy==2.0.31
 sqlmodel==0.0.19
-uvicorn==0.30.1
+uvicorn==0.30.3
