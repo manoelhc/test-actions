@@ -3,7 +3,7 @@ fastapi==0.111.1
 opentelemetry-distro==0.45b0
 opentelemetry-instrumentation==0.45b0
 pydantic==2.8.2
-PyJWT==2.8.0
+PyJWT==2.9.0
 pytest==8.3.2
 python-decouple==3.8
 python-dotenv==1.0.1
