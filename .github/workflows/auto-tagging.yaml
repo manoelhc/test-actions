@@ -11,8 +11,13 @@ on:
       - ci/*
       - chore/*
       - release/*
+    paths:
+      - 'src/**'
+      - '.env.local'
+      - 'requirements.txt'
+      - 'requirements-dev.txt'
 env:
-    BUMP_PATCH: ^(fix|hotfix|ci)+(\([-A-Z0-9a-z]+\))?:(.*)+$
+    BUMP_PATCH: ^chore\(deps\):|fix|hotfix|ci)+(\([-A-Z0-9a-z]+\))?:(.*)+$
     BUMP_MINOR: ^(feat|chore)+(\([-A-Z0-9a-z]+\))?:(.*)+$
     BUMP_MAJOR: ^((feat|chore|fix)+(\([-A-Z0-9a-z]+\)?)!|BREAKING CHANGE):(.*)+$
 jobs:
