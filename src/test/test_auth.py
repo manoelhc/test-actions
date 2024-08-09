@@ -1,8 +1,10 @@
 from fastapi.testclient import TestClient
 from migrations import create_db_and_tables, delete_db_and_tables, engine
 from app import app
-from helpers.auth import get_password_hash
+from helpers.auth import password_generator
+from helpers.jwt import decode_jwt_token
 import pytest
+import config
 from models.auth import Auth
 from models.user import User
 
@@ -45,16 +47,16 @@ def get_activation_token(username):
 def test_password_reset(client: TestClient):
     response = client.post(
         "/user",
-        json={"username": "test_user_creation", "email": "manoelhc@gmail.com"},
+        json={"username": config.TEST_USERNAME, "email": config.TEST_USEREMAIL},
     )
     output = response.json()
-    print(output)
+
     username = output["username"]
     token = get_activation_token(username)
-    password = get_password_hash("Secret123#!")
+    password = password_generator()
     json = {
         "username": username,
-        "reset_token": token,
+        "reset_token": token[1],
         "new_password": password,
         "new_password_confirm": password,
     }
@@ -62,3 +64,136 @@ def test_password_reset(client: TestClient):
     response = client.patch("/auth/password", json=json)
     print(response.json())
     assert response.status_code == 200
+
+
+def test_failed_password_reset_wrong_password_confirm(client: TestClient):
+    response = client.post(
+        "/user",
+        json={"username": config.TEST_USERNAME, "email": config.TEST_USEREMAIL},
+    )
+    output = response.json()
+    username = output["username"]
+    token = get_activation_token(username)
+    password = password_generator()
+    json = {
+        "username": username,
+        "reset_token": token[1],
+        "new_password": password,
+        "new_password_confirm": "wrong_password",
+    }
+    response = client.patch("/auth/password", json=json)
+    assert response.status_code == 400
+
+
+def test_failed_password_weak_password(client: TestClient):
+    response = client.post(
+        "/user",
+        json={"username": config.TEST_USERNAME, "email": config.TEST_USEREMAIL},
+    )
+    output = response.json()
+    username = output["username"]
+    token = get_activation_token(username)
+    password = password_generator()[:4]
+    json = {
+        "username": username,
+        "reset_token": token[1],
+        "new_password": password,
+        "new_password_confirm": password,
+    }
+    response = client.patch("/auth/password", json=json)
+    assert response.status_code == 400
+
+
+def test_failed_password_wrong_token(client: TestClient):
+    response = client.post(
+        "/user",
+        json={"username": config.TEST_USERNAME, "email": config.TEST_USEREMAIL},
+    )
+    output = response.json()
+    username = output["username"]
+    token = get_activation_token(username)
+    password = password_generator()
+    json = {
+        "username": username,
+        "reset_token": token[1][:10],
+        "new_password": password,
+        "new_password_confirm": password,
+    }
+    response = client.patch("/auth/password", json=json)
+    assert response.status_code == 400
+
+
+def test_failed_wrong_user_password_reset(client: TestClient):
+    response = client.post(
+        "/user",
+        json={"username": config.TEST_USERNAME, "email": config.TEST_USEREMAIL},
+    )
+    output = response.json()
+    username = output["username"]
+    token = get_activation_token(username)
+    username = output["username"] + "wrong"
+    password = password_generator()
+    json = {
+        "username": username,
+        "reset_token": token[1],
+        "new_password": password,
+        "new_password_confirm": password,
+    }
+    response = client.patch("/auth/password", json=json)
+    assert response.status_code == 400
+
+
+def test_login(client: TestClient):
+    response = client.post(
+        "/user",
+        json={"username": config.TEST_USERNAME, "email": config.TEST_USEREMAIL},
+    )
+    output = response.json()
+    username = output["username"]
+    token = get_activation_token(username)
+    password = password_generator()
+    json = {
+        "username": username,
+        "reset_token": token[1],
+        "new_password": password,
+        "new_password_confirm": password,
+    }
+    client.patch("/auth/password", json=json)
+    response = client.post(
+        "/auth/login",
+        json={"username": username, "password": password},
+    )
+    output = response.json()
+    print(output)
+
+    assert response.status_code == 200
+    assert "access_token" in output
+
+    token = decode_jwt_token(output["access_token"])
+    assert token["username"] == username
+
+
+def test_faled_login(client: TestClient):
+    response = client.post(
+        "/user",
+        json={"username": config.TEST_USERNAME, "email": config.TEST_USEREMAIL},
+    )
+    output = response.json()
+    username = output["username"]
+    token = get_activation_token(username)
+    password = password_generator()
+    json = {
+        "username": username,
+        "reset_token": token[1],
+        "new_password": password,
+        "new_password_confirm": password,
+    }
+    client.patch("/auth/password", json=json)
+    response = client.post(
+        "/auth/login",
+        json={"username": username, "password": password + "wrong"},
+    )
+    output = response.json()
+    print(output)
+
+    assert response.status_code == 422

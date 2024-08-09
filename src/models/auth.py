@@ -19,7 +19,7 @@ class Auth(SQLModel, table=True):
     )
     password: str = Field(nullable=False, max_length=255)
     active: bool = Field(default=True, nullable=False)
-    reset_token: str = Field(nullable=True, max_length=44)
+    reset_token: str = Field(nullable=True, max_length=64)
 
     created_at: datetime = Field(default=datetime.now())
     updated_at: datetime | None = Field(default=datetime.now(), nullable=True)
@@ -39,7 +39,7 @@ class Auth(SQLModel, table=True):
             is None
         ):
             raise ValueError(
-                "Password must have at least one uppercase letter, one lowercase letter, one number, and one special character",
+                "Password must have at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)",
             )
         return get_password_hash(password)
 
@@ -58,3 +58,7 @@ class AuthPasswordReset(SQLModel):
 class AuthAuthentication(SQLModel):
     username: str
     password: str
+
+
+class AuthLoginResponse(SQLModel):
+    access_token: str

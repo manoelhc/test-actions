@@ -20,3 +20,8 @@ def get_password_token(length=44) -> str:
     hasher.update(bytearray(password.encode("utf-8")))
     hasher.update(bytearray(config.PASSWORD_SALT.encode("utf-8")))
     return str(b64encode(hasher.digest())[:43])
+
+
+def password_generator(length=44) -> str:
+    chars = string.ascii_letters + string.digits + "@$!%*?&"
+    return "".join(secrets.choice(chars) for _ in range(length))

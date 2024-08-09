@@ -2,6 +2,7 @@ from fastapi.testclient import TestClient
 from migrations import create_db_and_tables, delete_db_and_tables
 from app import app
 import pytest
+import config
 
 
 @pytest.fixture
@@ -56,36 +57,39 @@ def test_invalid_users(client: TestClient):
     Args:
         client (TestClient): The test client for making HTTP requests.
     """
-    response = client.post("/user", json={"username": "t", "email": "email@gmail.com"})
-    assert response.status_code == 422
-
     response = client.post(
         "/user",
-        json={"username": "ttt&", "email": "email@gmail.com"},
+        json={"username": "t", "email": config.TEST_USEREMAIL},
     )
     assert response.status_code == 422
 
     response = client.post(
         "/user",
-        json={"username": "ttt,asd", "email": "email@gmail.com"},
+        json={"username": "ttt&", "email": config.TEST_USEREMAIL},
     )
     assert response.status_code == 422
 
     response = client.post(
         "/user",
-        json={"username": "ttt-test", "email": "email@gmail.com"},
+        json={"username": "ttt,asd", "email": config.TEST_USEREMAIL},
     )
     assert response.status_code == 422
 
     response = client.post(
         "/user",
-        json={"username": "tt*", "email": "email@gmail.com"},
+        json={"username": "ttt-test", "email": config.TEST_USEREMAIL},
     )
     assert response.status_code == 422
 
     response = client.post(
         "/user",
-        json={"username": "laws[deleted]", "email": "email@gmail.com"},
+        json={"username": "tt*", "email": config.TEST_USEREMAIL},
+    )
+    assert response.status_code == 422
+
+    response = client.post(
+        "/user",
+        json={"username": "laws[deleted]", "email": config.TEST_USEREMAIL},
     )
     assert response.status_code == 422
 

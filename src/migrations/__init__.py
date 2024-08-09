@@ -1,7 +1,7 @@
 from sqlmodel import Session, SQLModel, create_engine, select
 from models.user import User
 from models.auth import Auth
-import uuid
+from helpers.auth import get_password_hash
 
 import config
 
@@ -41,7 +41,7 @@ def seed_db():
     print("Seeding DB")
     default_username = "admin"
     # ruff: noqa: B105
-    default_password = f"{uuid.uuid4()}!8"
+    default_password = get_password_hash()
 
     session = Session(engine)
     user = User(
