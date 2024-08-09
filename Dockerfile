@@ -1,12 +1,12 @@
 # Builder
-FROM python@sha256:f6d04873f0a67146854270e5f6513ed5e0165557c1b10689f1a20e9e65c8fe8e AS builder
+FROM python@sha256:e8be0ea148390d08bc077840cf87ac6a538d80b0ea1e8752b3e3982987cd0a53 AS builder
 LABEL org.opencontainers.image.source="https://github.com/docker-library/python"
 LABEL org.opencontainers.image.description="Python 3.12.0"
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential=12.9 \
     rustc=1.63.0+dfsg1-2 \
-    libpq-dev=15.6-0+deb12u1 \
+    libpq-dev=15.7-0+deb12u1 \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
@@ -21,7 +21,7 @@ COPY src /app
 RUN python -m compileall .
 
 # Final
-FROM python@sha256:f6d04873f0a67146854270e5f6513ed5e0165557c1b10689f1a20e9e65c8fe8e
+FROM python@sha256:e8be0ea148390d08bc077840cf87ac6a538d80b0ea1e8752b3e3982987cd0a53
 WORKDIR /app
 COPY --from=builder --chown=root:root /packages /packages
 COPY --from=builder --chown=root:root /app /app
