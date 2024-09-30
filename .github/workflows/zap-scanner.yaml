@@ -19,7 +19,7 @@ jobs:
           curl --retry 10 --retry-connrefused --retry-max-time 120 -k -s https://127.0.0.1/health
 
       - name: ZAP Scan
-        uses: zaproxy/action-api-scan@v0.7.0
+        uses: zaproxy/action-api-scan@v0.8.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           format: openapi
