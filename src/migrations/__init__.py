@@ -1,5 +1,7 @@
-from sqlmodel import Session, SQLModel, create_engine
+from sqlmodel import Session, SQLModel, create_engine, select
 from models.user import User
+from models.auth import Auth
+from helpers.auth import get_password_hash
 
 import config
 
@@ -36,7 +38,32 @@ def seed_db():
     This function creates a new session, adds a demo user to the session,
     and commits the changes to the database.
     """
+    print("Seeding DB")
+    default_username = "admin"
+    # ruff: noqa: B105
+    default_password = get_password_hash()
+
     session = Session(engine)
-    user = User(username="demo", is_active=True)
+    user = User(
+        username=default_username,
+        email=f"{default_username}@example.com",
+        is_active=True,
+    )
     session.add(user)
+    session.commit()
+
+    user = session.exec(
+        select(User).where(
+            User.username == default_username,
+            User.email == f"{default_username}@example.com",
+            # ruff: noqa: E712
+            User.is_active == True,
+            # ruff: noqa: E711
+            User.deleted_at == None,
+        ),
+    ).first()
+
+    session = Session(engine)
+    auth = Auth(username_id=user.id, password=default_password)
+    session.add(auth)
     session.commit()

@@ -10,13 +10,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
-COPY src /app
+
 COPY packages/manocorp /manocorp
 COPY requirements.txt /app
 WORKDIR /app
 ENV PYTHONPATH=/packages
 RUN pip install --cache-dir=/tmp -r requirements.txt --target=/packages
 RUN pip install --cache-dir=/tmp /manocorp --force-reinstall --target=/packages
+COPY src /app
 RUN python -m compileall .
 
 # Final
