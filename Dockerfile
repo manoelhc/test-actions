@@ -1,7 +1,7 @@
 # Builder
 FROM python:3.13.0-slim-bookworm AS builder
 LABEL org.opencontainers.image.source="https://github.com/docker-library/python"
-LABEL org.opencontainers.image.description="Python 3.12"
+LABEL org.opencontainers.image.description="Python 3.13"
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential=12.9 \
