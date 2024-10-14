@@ -10,5 +10,5 @@ python-dotenv==1.0.1
 redis==5.0.8
 requests==2.32.3
 SQLAlchemy==2.0.32
-sqlmodel==0.0.21
+sqlmodel==0.0.22
 uvicorn==0.30.5
