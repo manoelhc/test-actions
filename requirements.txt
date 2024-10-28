@@ -7,7 +7,7 @@ PyJWT==2.9.0
 pytest==8.3.3
 python-decouple==3.8
 python-dotenv==1.0.1
-redis==5.1.1
+redis==5.2.0
 requests==2.32.3
 SQLAlchemy==2.0.36
 sqlmodel==0.0.22
