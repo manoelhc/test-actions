@@ -1,4 +1,4 @@
-alembic==1.13.3
+alembic==1.14.0
 fastapi==0.115.2
 opentelemetry-distro==0.48b0
 opentelemetry-instrumentation==0.48b0
