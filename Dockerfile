@@ -1,5 +1,5 @@
 # Builder
-FROM python:3.13.0-slim-bookworm AS builder
+FROM python:3.13.1-slim-bookworm AS builder
 LABEL org.opencontainers.image.source="https://github.com/docker-library/python"
 LABEL org.opencontainers.image.description="Python 3.13"
 WORKDIR /app
@@ -20,7 +20,7 @@ RUN pip install --cache-dir=/tmp /manocorp --force-reinstall --target=/packages
 RUN python -m compileall .
 
 # Final
-FROM python:3.13.0-slim-bookworm
+FROM python:3.13.1-slim-bookworm
 WORKDIR /app
 COPY --from=builder --chown=root:root /packages /packages
 COPY --from=builder --chown=root:root /app /app
