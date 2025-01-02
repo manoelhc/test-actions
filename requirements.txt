@@ -1,5 +1,5 @@
 alembic==1.14.0
-fastapi==0.115.2
+fastapi==0.115.6
 opentelemetry-distro==0.48b0
 opentelemetry-instrumentation==0.48b0
 pydantic==2.9.2
