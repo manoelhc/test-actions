@@ -9,7 +9,7 @@ on:
 
 jobs:
   Documentation:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - name: Snorkell DocGen Client
       uses: SingularityX-ai/snorkell-documentation-client@v1.0.0
