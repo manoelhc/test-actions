@@ -21,13 +21,17 @@ on:
   schedule:
     - cron: '0 0 * * 5'
 env:
-    BUMP_PATCH: ^chore\(deps\):|fix|hotfix|ci)+(\([-A-Z0-9a-z]+\))?:(.*)+$
+    BUMP_PATCH: ^(fix|hotfix|ci)+(\([-A-Z0-9a-z]+\))?:(.*)+$|^chore\(deps\):(.*)+$|^chore\(bump\):(.*)+$|^\[Snyk\](.*)+$
     BUMP_MINOR: ^(feat|chore)+(\([-A-Z0-9a-z]+\))?:(.*)+$
     BUMP_MAJOR: ^((feat|chore|fix)+(\([-A-Z0-9a-z]+\)?)!|BREAKING CHANGE):(.*)+$
+    REGISTRY: ghcr.io
+    IMAGE_NAME: ${{ github.repository }}
 jobs:
   tag:
     permissions: write-all
     runs-on: ubuntu-latest
+    outputs:
+      image_version: ${{ steps.apply_version.outputs.new_version }}
     steps:
     - uses: actions/checkout@v4
       with:
@@ -54,19 +58,23 @@ jobs:
        echo "minor=${minor}" >> "$GITHUB_OUTPUT"
        echo "major=${major}" >> "$GITHUB_OUTPUT"
 
-       next_version=${major:-${minor:-${patch}}}
+       next_version=${patch:-${minor:-${major}}}
+
+       if [[ -z $next_version ]]; then
+         echo "No version was generated due to PR title not compatible with Conventional Commits."
+         echo "PR Title: $PR_TITLE"
+         exit 1
+       fi
 
        echo "next_version=${next_version}" >> "$GITHUB_OUTPUT"
 
     - uses: mshick/add-pr-comment@v2
-      if: steps.versions.outputs.next_version == 0
       with:
          message: |
            No tag was generated due to PR title not compatible with Conventional Commits.
 
     - name: Tag new version
       id: apply_version
-      if: steps.versions.outputs.current_version != 0 || steps.versions.outputs.next_version == 0
       env:
         VERSION: "${{ steps.versions.outputs.next_version }}"
         PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -120,7 +128,7 @@ jobs:
         echo "new_hash=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
 
     - uses: mshick/add-pr-comment@v2
-      if: startsWith(steps.apply_version.outputs.old_version, 'v')
+      if: startsWith(steps.apply_version.outputs.new_version, 'v')
       with:
         message: |
           Tag `${{ steps.apply_version.outputs.old_version }}` removed.
@@ -139,3 +147,96 @@ jobs:
       with:
         generate_release_notes: true
         tag_name: "${{ steps.apply_version.outputs.new_version }}"
+
+    # Remove the PR tag if the PR is closed
+    - name: Remove PR tag
+      if: github.event.pull_request.merged == true && github.event.pull_request.number != null
+      env:
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        VERSION: "${{ steps.versions.outputs.next_version }}"
+      run: |
+        git fetch --tags origin
+        # Check if the tag is already deleted
+        tag_exists=$(git tag -l | grep -F ${VERSION}-${PR_NUMBER} || true)
+        if [[ -z "${tag_exists}" ]]; then
+          echo "The tag ${VERSION}-${PR_NUMBER} has already been deleted."
+        else
+          git tag -d ${VERSION}-${PR_NUMBER}
+          git push --delete origin ${VERSION}-${PR_NUMBER}
+        fi
+
+  push-image:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    needs: tag
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@v5.5.1
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+    - name: Log in to the Container registry
+      uses: docker/login-action@v3.1.0
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build and push Docker image
+      id: push
+      uses: docker/build-push-action@v5.3.0
+      with:
+        context: .
+        push: true
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.tag.outputs.image_version }}
+        labels: ${{ steps.meta.outputs.labels }}
+    # Remove the PR tag if the PR is closed
+    - name: Remove Image tag with PR from registry
+      if: github.event.pull_request.merged == true && github.event.pull_request.number != null
+      env:
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        VERSION: "${{ steps.versions.outputs.next_version }}"
+        TAG: ${{ needs.tag.outputs.image_version }}
+      run: |
+        docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${TAG}-${PR_NUMBER}
+        docker rmi ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${TAG}-${PR_NUMBER}
+        docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${TAG}-${PR_NUMBER}
+  test-image-docker:
+    needs:
+      - tag
+      - push-image
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Test Docker image
+      run: |
+        docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.tag.outputs.image_version }}
+        docker run -d --name test-actions --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.tag.outputs.image_version }}
+        docker exec test-actions python docker_healthcheck.py
+  test-image-kubernetes:
+    needs:
+      - tag
+      - push-image
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Install minikube
+      id: minikube
+      uses: medyagh/setup-minikube@master
+      with:
+        start: false
+    - uses: azure/setup-helm@v4.2.0
+      with:
+        version: v3.15.1
+    - uses: extractions/setup-just@v2
+    - name:  Deploy to minikube and the helm chart
+      run: |
+        just install-k8s
