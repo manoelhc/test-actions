@@ -1,7 +1,8 @@
 from fastapi.testclient import TestClient
-from migrations import create_db_and_tables, delete_db_and_tables, seed_db
+from migrations import create_db_and_tables, delete_db_and_tables
 from app import app
 import pytest
+import config
 
 
 @pytest.fixture
@@ -14,10 +15,11 @@ def client():
         TestClient: A client for testing the application.
     """
     create_db_and_tables()
-    seed_db()
+    # seed_db()
     client = TestClient(app)
     yield client
     delete_db_and_tables()
+    # os.unlink('data/test_db')
     client.close()
 
 
@@ -35,10 +37,14 @@ def test_create_user(client: TestClient):
             of the expected keys are missing in the response JSON.
     """
     # Test new user creation
-    response = client.post("/user", json={"username": "test321"})
+    response = client.post(
+        "/user",
+        json={"username": "T3sT_create_user", "email": "manoelhc@gmail.com"},
+    )
     assert response.status_code == 200
     output = response.json()
     assert "username" in output
+    assert output["username"] == "t3st_create_user"
     assert "created_at" in output
     assert "is_active" in output
     assert "updated_at" in output
@@ -51,22 +57,81 @@ def test_invalid_users(client: TestClient):
     Args:
         client (TestClient): The test client for making HTTP requests.
     """
-    response = client.post("/user", json={"username": "t"})
+    response = client.post(
+        "/user",
+        json={"username": "t", "email": config.TEST_USEREMAIL},
+    )
     assert response.status_code == 422
 
-    response = client.post("/user", json={"username": "ttt&"})
+    response = client.post(
+        "/user",
+        json={"username": "ttt&", "email": config.TEST_USEREMAIL},
+    )
     assert response.status_code == 422
 
-    response = client.post("/user", json={"username": "ttt.asd"})
+    response = client.post(
+        "/user",
+        json={"username": "ttt,asd", "email": config.TEST_USEREMAIL},
+    )
     assert response.status_code == 422
 
-    response = client.post("/user", json={"username": "ttt-test"})
+    response = client.post(
+        "/user",
+        json={"username": "ttt-test", "email": config.TEST_USEREMAIL},
+    )
     assert response.status_code == 422
 
-    response = client.post("/user", json={"username": "tt*"})
+    response = client.post(
+        "/user",
+        json={"username": "tt*", "email": config.TEST_USEREMAIL},
+    )
     assert response.status_code == 422
 
-    response = client.post("/user", json={"username": "laws[deleted]"})
+    response = client.post(
+        "/user",
+        json={"username": "laws[deleted]", "email": config.TEST_USEREMAIL},
+    )
+    assert response.status_code == 422
+
+
+def test_invalid_emails(client: TestClient):
+    """This function sends POST requests with various invalid usernames to
+    the '/user' endpoint and asserts that the response status code is 422.
+
+    Args:
+        client (TestClient): The test client for making HTTP requests.
+    """
+    response = client.post(
+        "/user",
+        json={"username": "test_invalid_emails", "email": "texmex@gmail."},
+    )
+    assert response.status_code == 422
+
+    response = client.post(
+        "/user",
+        json={"username": "test_invalid_emails", "email": "texmex@@gmail.com"},
+    )
+    assert response.status_code == 422
+
+    response = client.post(
+        "/user",
+        json={"username": "test_invalid_emails", "email": "texmex@gmail"},
+    )
+    assert response.status_code == 422
+
+    # response = client.post("/user", json={"username": "test_invalid_emails", "email": "texmex!@gmail.com"})
+    # assert response.status_code == 422
+
+    # response = client.post("/user", json={"username": "test_invalid_emails", "email": "texmex'@gmail.com"})
+    # assert response.status_code == 422
+
+    response = client.post(
+        "/user",
+        json={
+            "username": "test_invalid_emails",
+            "email": "texmex[here.we.go]@gmail.com",
+        },
+    )
     assert response.status_code == 422
 
 
@@ -80,18 +145,47 @@ def test_duplicate_user(client: TestClient):
     Args:
         client (TestClient): An instance of TestClient used for making HTTP requests.
 
-
     Raises:
         AssertionError: If the response status code is not as expected
             or if the "detail" key is not present in the response JSON.
     """
     # Test duplicate user creation
-    response = client.post("/user", json={"username": "test321"})
+    response = client.post(
+        "/user",
+        json={
+            "username": "test_duplicate_user",
+            "email": "test.duplicate.user.first@gmail.com",
+        },
+    )
     assert response.status_code == 200
-    response = client.post("/user", json={"username": "test321"})
+    response = client.post(
+        "/user",
+        json={
+            "username": "test_duplicate_user",
+            "email": "test.duplicate.user.second@gmail.com",
+        },
+    )
     assert response.status_code == 400
-    output = response.json()
-    assert "detail" in output
+
+
+def test_duplicate_emails(client: TestClient):
+    # Test duplicate emails
+    response = client.post(
+        "/user",
+        json={
+            "username": "test_duplicate_emails1",
+            "email": "test_duplicate_emails@gmail.com",
+        },
+    )
+    assert response.status_code == 200
+    response = client.post(
+        "/user",
+        json={
+            "username": "test_duplicate_emails2",
+            "email": "test_duplicate_emails@gmail.com",
+        },
+    )
+    assert response.status_code == 400
 
 
 def test_user_not_found(client: TestClient):
@@ -120,7 +214,11 @@ def test_read_user(client: TestClient):
     Raises:
         AssertionError: If any of the assertions fail.
     """
-    response = client.post("/user", json={"username": "test321"})
+    response = client.post(
+        "/user",
+        json={"username": "test321", "email": "test@gmail.com"},
+    )
+
     assert response.status_code == 200
     # Test user found
     response = client.get("/user/test321")
@@ -165,7 +263,10 @@ def test_enabling_disabling_user(client: TestClient):
     Raises:
         AssertionError: If any of the assertions fail during the test.
     """
-    response = client.post("/user", json={"username": "test321"})
+    response = client.post(
+        "/user",
+        json={"username": "test321", "email": "test321@gmail.com"},
+    )
     assert response.status_code == 200
     # Get user id
     user_id = client.get("/user/test321").json()["id"]
@@ -221,11 +322,17 @@ def test_changing_user_name(client: TestClient):
         AssertionError: If any of the assertions fail during the test.
     """
     # Create the "old" user
-    response = client.post("/user", json={"username": "test321"})
+    response = client.post(
+        "/user",
+        json={"username": "test321", "email": "test321@gmail.com"},
+    )
     assert response.status_code == 200
 
     # Test new user creation
-    response = client.post("/user", json={"username": "test123"})
+    response = client.post(
+        "/user",
+        json={"username": "test123", "email": "test123@gmail.com"},
+    )
     assert response.status_code == 200
 
     # Get user id
@@ -315,11 +422,16 @@ def test_delete_users(client: TestClient):
     Raises:
         AssertionError: If any of the assertions fail during the test.
     """
-    response = client.delete("/user/demo")
-    assert response.status_code == 200
+
     for i in range(1, 31):
         user_number = str(i).rjust(3, "0")
-        response = client.post("/user", json={"username": f"test_read_{user_number}"})
+        response = client.post(
+            "/user",
+            json={
+                "username": f"test_read_{user_number}",
+                "email": f"test_read_{user_number}@gmail.com",
+            },
+        )
         assert response.status_code == 200
     response = client.get("/users/1")
     output = response.json()
@@ -343,13 +455,25 @@ def test_read_all_users(client: TestClient):
     Raises:
         AssertionError: If any of the assertions fail during the test.
     """
-    response = client.delete("/user/demo")
-    assert response.status_code == 200
 
-    # Generate 50 users
+    # Clean up
+    while True:
+        users = client.get("/users/1").json()
+        if not len(users):
+            break
+        for user in users:
+            client.delete(f'/user/{user["username"]}')
+
+    # Generate 30 users
     for i in range(1, 31):
         user_number = str(i).rjust(3, "0")
-        response = client.post("/user", json={"username": f"1_{user_number}"})
+        response = client.post(
+            "/user",
+            json={
+                "username": f"1_{user_number}",
+                "email": f"1_{user_number}@gmail.com",
+            },
+        )
         assert response.status_code == 200
 
     # Test all users

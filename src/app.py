@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 import uvicorn
 
-from routers import user, healthcheck
+from routers import user, healthcheck, auth
 import config
 
 app = FastAPI()
@@ -17,6 +17,7 @@ app.add_middleware(
     allow_headers=config.CORS_ALLOW_HEADERS,
 )
 app.include_router(user.router)
+app.include_router(auth.router)
 app.include_router(healthcheck.router)
 
 # skipcq: TCV-001 - This is the main entry point of the application
