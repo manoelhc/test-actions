@@ -11,7 +11,7 @@ jobs:
           key: ${{ runner.os }}-deepsource
           restore-keys: |
             ${{ runner.os }}-deepsource
-      - uses: extractions/setup-just@v2
+      - uses: extractions/setup-just@v3
       - name: Install Python 3.12
         uses: actions/setup-python@v5
         with:
