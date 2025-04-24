@@ -7,7 +7,7 @@ on:
       - main # The 'main' branch
 jobs:
   qodana:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write

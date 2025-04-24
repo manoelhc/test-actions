@@ -6,7 +6,7 @@ jobs:
   base_branch_cov:
     if: github.event.pull_request.draft == true
     permissions: write-all
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
