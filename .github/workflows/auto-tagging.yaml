@@ -1,16 +1,25 @@
 name: Create Release
 
+#on:
+#  pull_request:
+#    types: [opened, synchronize, closed, reopened]
+#    branches:
+#      - main
+#      - feat/*
+#      - fix/*
+#      - hotfix/*
+#      - ci/*
+#      - chore/*
+#      - release/*
+#    paths:
+#      - 'src/**'
+#      - '.env.local'
+#      - 'requirements.txt'
+#      - 'requirements-dev.txt'
 on:
-  pull_request:
-    types: [opened, synchronize, closed, reopened]
-    branches:
-      - main
-      - feat/*
-      - fix/*
-      - hotfix/*
-      - ci/*
-      - chore/*
-      - release/*
+  # Trigger the workflow every Friday at 00:00 UTC
+  schedule:
+    - cron: '0 0 * * 5'
 env:
     BUMP_PATCH: ^(fix|hotfix|ci)+(\([-A-Z0-9a-z]+\))?:(.*)+$|^chore\(deps\):(.*)+$|^chore\(bump\):(.*)+$|^\[Snyk\](.*)+$
     BUMP_MINOR: ^(feat|chore)+(\([-A-Z0-9a-z]+\))?:(.*)+$
