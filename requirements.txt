@@ -12,3 +12,4 @@ requests==2.32.3
 SQLAlchemy==2.0.36
 sqlmodel==0.0.22
 uvicorn==0.32.0
+starlette>=0.47.2 # not directly required, pinned by Snyk to avoid a vulnerability
