@@ -9,7 +9,7 @@ jobs:
       PIP_CACHE_DIR: /home/runner/.cache/pip
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/cache@v4
         name: Cache static dependencies
         with:

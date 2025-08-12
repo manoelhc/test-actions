@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Scan the webapplication
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: extractions/setup-just@v3
       # This step builds the image and runs the web application in the background for the ZAP scan
       - name: Run image
